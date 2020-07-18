@@ -6,6 +6,9 @@ Zhangcheng Liang
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <map>
+#include <string.h>
+#include <vector>
 void yyerror(const char *msg);
 extern int line_num;
 extern int col_num;
