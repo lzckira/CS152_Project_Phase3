@@ -29,8 +29,8 @@
 	
 	struct var_struct {
 		bool array;
-		string code;
-		list<string> ids;
+		int index;
+		string id;
 	};
 	/* end the structures for non-terminal types */
 }
@@ -74,6 +74,8 @@ yy::parser::symbol_type yylex();
 %type <string> program function statements
 %type <dec_struct> declarations declaration
 %type <list<string>> identifiers
+%type <var_struct> var
+%type <list<var_struct>> vars
 %token ERROR
 
 
@@ -92,7 +94,7 @@ prog_start: 	program {if(no_error) cout << $1;}
 		;
 
 program:	{$$ = "";}
-		|function program {$$ = $1 + "\n" + $2;}
+		| function program {$$ = $1 + "\n" + $2;}
 		;
 
 function:	FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY
@@ -115,14 +117,14 @@ function:	FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LO
 		;
 
 declarations: 	{$$.code=""; $$.ids=list<string>();}
-		| declaration SEMICOLON declarations {
-			$$.code = $1.code + $3.code;
-			$$.ids = $1.ids;
-			for(list<string>::iterator it = $3.ids.begin(); it != $3.ids.end(); it++){
+		| declarations declaration SEMICOLON {
+			$$.code = $1.code + $2.code;
+			for(list<string>::iterator it = $1.ids.begin(); it != $1.ids.end(); it++){
 				$$.ids.push_back(*it);
 			}
+			$$.ids.push_back($2);
 		}
-		| declaration declarations{
+		| declarations declaration{
 			/*error*/
 		}
 		;
@@ -148,8 +150,6 @@ declaration:	identifiers COLON INTEGER
 			/*error*/
 		}
 
-
-
 identifiers:	IDENT
 		{ 
 		  $$.push_back($1); 
@@ -172,11 +172,9 @@ statements: 	{$$.code = "";}
 		}
 		;
 
-statement:	var ASSIGN expression{
-			if()
-				$$.code += $1.code;
-			$$.code += $3.code;
-			
+statement:	var ASSIGN expression
+		{
+			$$.code = "= " + $1 + ", " + $3 + "\n";
 		}
 		| IF bool_exp THEN statements ENDIF{
 		
@@ -191,10 +189,15 @@ statement:	var ASSIGN expression{
 
 		}
 		| READ vars{
+			for(list<string>::iterator it = $2.begin(); it != $2.end(); it++){
+				$$.code += ".< " + *it + "\n";
+			}
 
 		}
 		| WRITE vars{
-
+			for(list<string>::iterator it = $2.begin(); it != $2.end(); it++){
+				$$.code += ".> " + *it + "\n";
+			}
 		}
 		| CONTINUE{
 
@@ -207,19 +210,29 @@ statement:	var ASSIGN expression{
 		}
 		;
 		
-vars:	var{printf("vars -> var\n");}
-		| var COMMA vars{printf("vars -> var COMMA vars\n");}
+vars:	var
+		{
+			$$.push_back($1);
+		}
+		| var COMMA vars
+		{
+			$$.push_back($1);
+			for(list<string>::iterator it = $3.begin(); it != $3.end(); it++){
+				$$.push_back(*it);
+			}
+		}
 		;
 		
 var:	IDENT
 		{ 
 			$$.array = false;
-			$$.ids.push_back($1);
+			$$.id = $1;
 		}
 		| IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET
 		{
 			$$.array = true;
-			$$.ids.push_back($1);
+			$$.id = $1;
+			$$.index = $3;
 		}
 		;
 
@@ -257,6 +270,14 @@ comp:		EQ		{$$.code = "==";}
 		|	GTE		{$$.code = ">=";}
 		;
 
+expressions:	expression{printf("expressions -> expression\n");}
+		| expression COMMA expressions{printf("expressions -> expression COMMA expressions\n");}
+		;
+
+expression:	multiplicative_expression{printf("expression -> multiplicative_expression\n");}
+		| multiplicative_expressions multiplicative_expression {printf("expression -> multiplicative_expressions multiplicative_expression\n");}
+		;
+
 multiplicative_expressions:  multiplicative_expression ADD{printf("multiplicative_expressions -> multiplicative_expression ADD\n");}
 		| multiplicative_expression SUB{printf("multiplicative_expressions -> multiplicative_expression SUB\n");}
 		| multiplicative_expressions ADD multiplicative_expression {printf("multiplicative_expressions -> multiplicative_expressions ADD multiplicative_expression\n");}
@@ -283,10 +304,6 @@ term:	var{printf("term -> var\n");}
 		| SUB L_PAREN expression R_PAREN %prec UMINUS{printf("term -> SUB L_PAREN expression R_PAREN\n");}
 		| IDENT L_PAREN R_PAREN{printf("term -> IDENT L_PAREN R_PAREN\n");}
 		| IDENT L_PAREN expressions R_PAREN{printf("term -> IDENT L_PAREN expressions R_PAREN\n");}
-		;
-
-expressions:	expression{printf("expressions -> expression\n");}
-		| expression COMMA expressions{printf("expressions -> expression COMMA expressions\n");}
 		;
 
 
