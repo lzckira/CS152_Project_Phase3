@@ -112,6 +112,9 @@ declarations: 	{$$.code=""; $$.ids=list<string>();}
 				$$.ids.push_back(*it);
 			}
 		}
+		| declaration declarations{
+			/*error*/
+		}
 		;
 
 declaration:	identifiers COLON INTEGER
@@ -121,7 +124,6 @@ declaration:	identifiers COLON INTEGER
 			}
 			$$.ids = $1;
 		}
-		
 		| identifiers COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
 		{ 
 			for(list<string>::iterator it = $1.begin(); it != $1.end(); it++){
@@ -129,6 +131,14 @@ declaration:	identifiers COLON INTEGER
 			}
 			$$.ids = $1;
 		}
+		| identifiers INTEGER{
+			/*error*/	
+		}
+		| identifiers ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER{
+			/*error*/
+		}
+
+
 
 identifiers:	IDENT
 		{ 
@@ -144,8 +154,136 @@ identifiers:	IDENT
 		;
 
 
-statements: 	{$$ = "";}
+statements: 	{$$.code = "";}
+		|statement SEMICOLON statements{
+			$$.code = $1.code + $3.code;
+		} 
+		|statements statement{
+			/*error*/
+		}
 		;
+
+statement:	var ASSIGN expression{
+			if()
+				$$.code += $1.code;
+			$$.code += $3.code;
+			
+		}
+		| IF bool_exp THEN statements ENDIF{
+		
+		}
+		| IF bool_exp THEN statements ELSE statements ENDIF{
+
+		}
+		| WHILE bool_exp BEGINLOOP statements ENDLOOP{
+
+		}
+		| DO BEGINLOOP statements ENDLOOP WHILE bool_exp{
+
+		}
+		| READ vars{
+
+		}
+		| WRITE vars{
+
+		}
+		| CONTINUE{
+
+		}
+		| RETURN expression{
+
+		}
+		| var error expression{
+			/*error*/
+		}
+		;
+		
+vars:		var{
+			$$.puch_front($1);
+		}
+		| var COMMA vars{
+			
+		}
+		;
+
+bool_exp:	relation_and_exp{
+			$$.code = $1.code;
+		}
+		|relation_and_exp relation_and_exps{
+			
+		}
+		;
+
+relation_and_exps: OR relation_and_exp{
+			
+		}
+		| OR relation_and_exp relation_and_exps{
+		
+		}
+		;
+
+
+relation_and_exp: relation_exp{
+		
+		}
+		| relation_exp relation_exps{
+		
+		}
+		;
+
+relation_exps: 	AND relation_exp{
+		
+		}
+		| AND relation_exp relation_exps{
+		
+		}
+		;
+
+relation_exp:	expression comp expression
+		{}
+
+comp:		EQ	{$$.code = "==";}
+		|NEQ	{$$.code = "!=";}
+		|LT	{$$.code = "<";}
+		|GT	{$$.code = ">";}
+		|LTE	{$$.code = "<=";}
+		|GTE	{$$.code = ">=";}
+		;
+
+expression:	multiplicative_expression
+		{
+			$$.code = $1.code;
+		}
+		|multiplicative_expressions multiplicative_expression
+		{
+			$$.code = $1.code + $2.code;
+		}
+		;
+
+multiplicative_expressions:  multiplicative_expression ADD
+		{}
+
+multiplicative_expression: term
+		{
+		}
+
+
+terms:  	term MULT
+		{}
+
+term:		var
+		{}
+
+expressions:	expression
+		{}
+
+var:		ident
+		{}
+
+
+
+
+
 
 %%
 
