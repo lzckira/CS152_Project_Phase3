@@ -8,7 +8,7 @@ beginlocals
 	fib_n : integer;
 endlocals
 beginbody
-	read n, m;
-	fib_n := n + m;
-	write fib_n;
+	##read n, m;
+	##fib_n := n + m;
+	##write fib_n;
 endbody
