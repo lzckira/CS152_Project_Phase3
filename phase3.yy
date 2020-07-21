@@ -32,6 +32,10 @@
 		int index;
 		string id;
 	};
+	
+	struct vars_struct {
+		list<var_struct> var_list;
+	};
 	/* end the structures for non-terminal types */
 }
 
@@ -71,13 +75,14 @@ yy::parser::symbol_type yylex();
 %token SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN
 %token <int> NUMBER
 %type <string> IDENT
-%type <string> program function statements
+%type <string> program function statements statement comp
 %type <dec_struct> declarations declaration
 %type <list<string>> identifiers
 %type <var_struct> var
-%type <list<var_struct>> vars
+%type <vars_struct> vars
 %type <string> expressions expression multiplicative_expressions multiplicative_expression terms term
 %token ERROR
+%right UMINUS	
 
 
 	/* end of token specifications */
@@ -123,7 +128,9 @@ declarations: 	{$$.code=""; $$.ids=list<string>();}
 			for(list<string>::iterator it = $1.ids.begin(); it != $1.ids.end(); it++){
 				$$.ids.push_back(*it);
 			}
-			$$.ids.push_back($2);
+			for(list<string>::iterator it = $2.ids.begin(); it != $2.ids.end(); it++){
+				$$.ids.push_back(*it);
+			}
 		}
 		| declarations declaration{
 			/*error*/
@@ -164,18 +171,18 @@ identifiers:	IDENT
 		}
 		;
 
-statements: 	{$$.code = "";}
-		|statement SEMICOLON statements{
-			$$.code = $1.code + $3.code;
+statements: 	{$$ = "";}
+		| statement SEMICOLON statements{
+			$$ = $1 + $3;
 		} 
-		|statements statement{
+		| statements statement{
 			/*error*/
 		}
 		;
 
 statement:	var ASSIGN expression
 		{
-			$$.code = "= " + $1 + ", " + $3 + "\n";
+			/* $$.code = "= " + $1 + ", " + $3 + "\n"; */
 		}
 		| IF bool_exp THEN statements ENDIF{
 		
@@ -190,14 +197,15 @@ statement:	var ASSIGN expression
 
 		}
 		| READ vars{
-			for(list<string>::iterator it = $2.begin(); it != $2.end(); it++){
-				$$.code += ".< " + *it + "\n";
+			for(list<var_struct>::iterator it = $2.var_list.begin(); it != $2.var_list.end(); it++){
+				/*$$ += ".< " + *it.id + "\n";*/
+				cout << *it << endl;
 			}
 
 		}
 		| WRITE vars{
-			for(list<string>::iterator it = $2.begin(); it != $2.end(); it++){
-				$$.code += ".> " + *it + "\n";
+			for(list<var_struct>::iterator it = $2.var_list.begin(); it != $2.var_list.end(); it++){
+				/*$$ += ".> " + *it.id + "\n";*/
 			}
 		}
 		| CONTINUE{
@@ -213,13 +221,13 @@ statement:	var ASSIGN expression
 		
 vars:	var
 		{
-			$$.push_back($1);
+			$$.var_list.push_back($1);
 		}
 		| var COMMA vars
 		{
-			$$.push_back($1);
-			for(list<string>::iterator it = $3.begin(); it != $3.end(); it++){
-				$$.push_back(*it);
+			$$.var_list.push_back($1);
+			for(list<string>::iterator it = $3.var_list.begin(); it != $3.var_list.end(); it++){
+				$$.var_list.push_back(*it);
 			}
 		}
 		;
@@ -232,7 +240,7 @@ var:	IDENT
 		| IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET
 		{
 			$$.array = true;
-			$$.id = $1;
+			$$.id = $1 + "[" + $3 + "]";
 			$$.index = $3;
 		}
 		;
@@ -311,12 +319,12 @@ relation_exp:	expression comp expression
 		}
 		;
 
-comp:		EQ		{$$.code = "==";}
-		|	NEQ		{$$.code = "!=";}
-		|	LT		{$$.code = "<";}
-		|	GT		{$$.code = ">";}
-		|	LTE		{$$.code = "<=";}
-		|	GTE		{$$.code = ">=";}
+comp:		EQ		{$$ = "==";}
+		|	NEQ		{$$ = "!=";}
+		|	LT		{$$ = "<";}
+		|	GT		{$$ = ">";}
+		|	LTE		{$$ = "<=";}
+		|	GTE		{$$ = ">=";}
 		;
 
 expressions:	expression

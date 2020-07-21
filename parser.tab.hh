@@ -56,9 +56,19 @@
 		string code;
 		list<string> ids;
 	};
+	
+	struct var_struct {
+		bool array;
+		int index;
+		string id;
+	};
+	
+	struct vars_struct {
+		list<var_struct> var_list;
+	};
 	/* end the structures for non-terminal types */
 
-#line 62 "parser.tab.hh" // lalr1.cc:377
+#line 72 "parser.tab.hh" // lalr1.cc:377
 
 
 # include <cstdlib> // std::abort
@@ -135,7 +145,7 @@
 
 
 namespace yy {
-#line 139 "parser.tab.hh" // lalr1.cc:377
+#line 149 "parser.tab.hh" // lalr1.cc:377
 
 
 
@@ -296,7 +306,21 @@ namespace yy {
       // program
       // function
       // statements
+      // statement
+      // comp
+      // expressions
+      // expression
+      // multiplicative_expressions
+      // multiplicative_expression
+      // terms
+      // term
       char dummy4[sizeof(string)];
+
+      // var
+      char dummy5[sizeof(var_struct)];
+
+      // vars
+      char dummy6[sizeof(vars_struct)];
 };
 
     /// Symbol semantic values.
@@ -368,7 +392,8 @@ namespace yy {
         R_SQUARE_BRACKET = 303,
         ASSIGN = 304,
         NUMBER = 305,
-        ERROR = 306
+        ERROR = 306,
+        UMINUS = 307
       };
     };
 
@@ -413,6 +438,10 @@ namespace yy {
   basic_symbol (typename Base::kind_type t, const list<string> v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const string v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const var_struct v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const vars_struct v, const location_type& l);
 
 
       /// Constructor for symbols with semantic value.
@@ -681,6 +710,10 @@ namespace yy {
     symbol_type
     make_ERROR (const location_type& l);
 
+    static inline
+    symbol_type
+    make_UMINUS (const location_type& l);
+
 
     /// Build a parser object.
     parser ();
@@ -748,7 +781,7 @@ namespace yy {
     // Tables.
   // YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
   // STATE-NUM.
-  static const signed char yypact_[];
+  static const short int yypact_[];
 
   // YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
   // Performed when YYTABLE does not specify something else to do.  Zero
@@ -756,7 +789,7 @@ namespace yy {
   static const unsigned char yydefact_[];
 
   // YYPGOTO[NTERM-NUM].
-  static const signed char yypgoto_[];
+  static const short int yypgoto_[];
 
   // YYDEFGOTO[NTERM-NUM].
   static const signed char yydefgoto_[];
@@ -764,9 +797,9 @@ namespace yy {
   // YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
   // positive, shift that token.  If negative, reduce the rule whose
   // number is the opposite.  If YYTABLE_NINF, syntax error.
-  static const unsigned char yytable_[];
+  static const short int yytable_[];
 
-  static const signed char yycheck_[];
+  static const short int yycheck_[];
 
   // YYSTOS[STATE-NUM] -- The (internal number of the) accessing
   // symbol of state STATE-NUM.
@@ -787,7 +820,7 @@ namespace yy {
     static const char* const yytname_[];
 #if YYDEBUG
   // YYRLINE[YYN] -- Source line where rule number YYN was defined.
-  static const unsigned char yyrline_[];
+  static const unsigned short int yyrline_[];
     /// Report on the debug stream that the rule \a r is going to be reduced.
     virtual void yy_reduce_print_ (int r);
     /// Print the state stack on the debug stream.
@@ -886,12 +919,12 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 25,     ///< Last index in yytable_.
-      yynnts_ = 8,  ///< Number of nonterminal symbols.
+      yylast_ = 282,     ///< Last index in yytable_.
+      yynnts_ = 23,  ///< Number of nonterminal symbols.
       yyfinal_ = 6, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
-      yyntokens_ = 52  ///< Number of tokens.
+      yyntokens_ = 53  ///< Number of tokens.
     };
 
 
@@ -936,9 +969,9 @@ namespace yy {
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
       35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
-      45,    46,    47,    48,    49,    50,    51
+      45,    46,    47,    48,    49,    50,    51,    52
     };
-    const unsigned int user_token_number_max_ = 306;
+    const unsigned int user_token_number_max_ = 307;
     const token_number_type undef_token_ = 2;
 
     if (static_cast<int>(t) <= yyeof_)
@@ -971,8 +1004,8 @@ namespace yy {
   {
       switch (other.type_get ())
     {
-      case 56: // declarations
-      case 57: // declaration
+      case 57: // declarations
+      case 58: // declaration
         value.copy< dec_struct > (other.value);
         break;
 
@@ -980,15 +1013,31 @@ namespace yy {
         value.copy< int > (other.value);
         break;
 
-      case 58: // identifiers
+      case 59: // identifiers
         value.copy< list<string> > (other.value);
         break;
 
       case 4: // IDENT
-      case 54: // program
-      case 55: // function
-      case 59: // statements
+      case 55: // program
+      case 56: // function
+      case 60: // statements
+      case 61: // statement
+      case 69: // comp
+      case 70: // expressions
+      case 71: // expression
+      case 72: // multiplicative_expressions
+      case 73: // multiplicative_expression
+      case 74: // terms
+      case 75: // term
         value.copy< string > (other.value);
+        break;
+
+      case 63: // var
+        value.copy< var_struct > (other.value);
+        break;
+
+      case 62: // vars
+        value.copy< vars_struct > (other.value);
         break;
 
       default:
@@ -1008,8 +1057,8 @@ namespace yy {
     (void) v;
       switch (this->type_get ())
     {
-      case 56: // declarations
-      case 57: // declaration
+      case 57: // declarations
+      case 58: // declaration
         value.copy< dec_struct > (v);
         break;
 
@@ -1017,15 +1066,31 @@ namespace yy {
         value.copy< int > (v);
         break;
 
-      case 58: // identifiers
+      case 59: // identifiers
         value.copy< list<string> > (v);
         break;
 
       case 4: // IDENT
-      case 54: // program
-      case 55: // function
-      case 59: // statements
+      case 55: // program
+      case 56: // function
+      case 60: // statements
+      case 61: // statement
+      case 69: // comp
+      case 70: // expressions
+      case 71: // expression
+      case 72: // multiplicative_expressions
+      case 73: // multiplicative_expression
+      case 74: // terms
+      case 75: // term
         value.copy< string > (v);
+        break;
+
+      case 63: // var
+        value.copy< var_struct > (v);
+        break;
+
+      case 62: // vars
+        value.copy< vars_struct > (v);
         break;
 
       default:
@@ -1071,6 +1136,20 @@ namespace yy {
     , location (l)
   {}
 
+  template <typename Base>
+  parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const var_struct v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const vars_struct v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
 
   template <typename Base>
   inline
@@ -1097,8 +1176,8 @@ namespace yy {
     // Type destructor.
     switch (yytype)
     {
-      case 56: // declarations
-      case 57: // declaration
+      case 57: // declarations
+      case 58: // declaration
         value.template destroy< dec_struct > ();
         break;
 
@@ -1106,15 +1185,31 @@ namespace yy {
         value.template destroy< int > ();
         break;
 
-      case 58: // identifiers
+      case 59: // identifiers
         value.template destroy< list<string> > ();
         break;
 
       case 4: // IDENT
-      case 54: // program
-      case 55: // function
-      case 59: // statements
+      case 55: // program
+      case 56: // function
+      case 60: // statements
+      case 61: // statement
+      case 69: // comp
+      case 70: // expressions
+      case 71: // expression
+      case 72: // multiplicative_expressions
+      case 73: // multiplicative_expression
+      case 74: // terms
+      case 75: // term
         value.template destroy< string > ();
+        break;
+
+      case 63: // var
+        value.template destroy< var_struct > ();
+        break;
+
+      case 62: // vars
+        value.template destroy< vars_struct > ();
         break;
 
       default:
@@ -1140,8 +1235,8 @@ namespace yy {
     super_type::move(s);
       switch (this->type_get ())
     {
-      case 56: // declarations
-      case 57: // declaration
+      case 57: // declarations
+      case 58: // declaration
         value.move< dec_struct > (s.value);
         break;
 
@@ -1149,15 +1244,31 @@ namespace yy {
         value.move< int > (s.value);
         break;
 
-      case 58: // identifiers
+      case 59: // identifiers
         value.move< list<string> > (s.value);
         break;
 
       case 4: // IDENT
-      case 54: // program
-      case 55: // function
-      case 59: // statements
+      case 55: // program
+      case 56: // function
+      case 60: // statements
+      case 61: // statement
+      case 69: // comp
+      case 70: // expressions
+      case 71: // expression
+      case 72: // multiplicative_expressions
+      case 73: // multiplicative_expression
+      case 74: // terms
+      case 75: // term
         value.move< string > (s.value);
+        break;
+
+      case 63: // var
+        value.move< var_struct > (s.value);
+        break;
+
+      case 62: // vars
+        value.move< vars_struct > (s.value);
         break;
 
       default:
@@ -1220,7 +1331,7 @@ namespace yy {
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
      285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
      295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
-     305,   306
+     305,   306,   307
     };
     return static_cast<token_type> (yytoken_number_[type]);
   }
@@ -1525,10 +1636,16 @@ namespace yy {
     return symbol_type (token::ERROR, l);
   }
 
+  parser::symbol_type
+  parser::make_UMINUS (const location_type& l)
+  {
+    return symbol_type (token::UMINUS, l);
+  }
+
 
 
 } // yy
-#line 1532 "parser.tab.hh" // lalr1.cc:377
+#line 1649 "parser.tab.hh" // lalr1.cc:377
 
 
 
