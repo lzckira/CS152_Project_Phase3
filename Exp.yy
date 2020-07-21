@@ -42,7 +42,7 @@
 
 %code
 {
-#include "parser.tab.hh"
+#include "Exp.tab.hh"
 
 	/* you may need these header files 
 	 * add more header file if you need more
@@ -80,7 +80,7 @@ yy::parser::symbol_type yylex();
 %type <list<string>> identifiers
 %type <var_struct> var
 %type <vars_struct> vars
-%type <string> expressions expression multiplicative_expressions multiplicative_expression terms term
+%type <string> expressions expression multiplicative_expressions multiplicative_expression terms term relation_exp relation_exps bool_exp relation_and_exps relation_and_exp
 %token ERROR
 %right UMINUS	
 
@@ -167,7 +167,7 @@ identifiers:	IDENT
 		  for(list<string>::iterator it = $1.begin(); it != $1.end(); it++){
 				$$.push_back(*it);
 		  }
-		  $$.push_back($1);
+		  $$.push_back($3);
 		}
 		;
 
@@ -199,7 +199,6 @@ statement:	var ASSIGN expression
 		| READ vars{
 			for(list<var_struct>::iterator it = $2.var_list.begin(); it != $2.var_list.end(); it++){
 				/*$$ += ".< " + *it.id + "\n";*/
-				cout << *it << endl;
 			}
 
 		}
