@@ -76,6 +76,7 @@ yy::parser::symbol_type yylex();
 %type <list<string>> identifiers
 %type <var_struct> var
 %type <list<var_struct>> vars
+%type <string> expressions expression multiplicative_expressions multiplicative_expression terms term
 %token ERROR
 
 
@@ -236,30 +237,78 @@ var:	IDENT
 		}
 		;
 
-bool_exp:	relation_and_exp{printf("bool_exp -> relation_and_exp\n");}
-		| relation_and_exp relation_and_exps{printf("bool_exp -> relation_and_exp relation_and_exps\n");}
+bool_exp:	relation_and_exp
+		{
+			
+		}
+		| relation_and_exp relation_and_exps
+		{
+			
+		}
 		;
 
-relation_and_exps: OR relation_and_exp{printf("relation_and_exps -> OR relation_and_exp\n");}
-		| OR relation_and_exp relation_and_exps{printf("relation_and_exps -> OR relation_and_exp relation_and_exps\n");}
+relation_and_exps: OR relation_and_exp
+		{
+			
+		}
+		| OR relation_and_exp relation_and_exps
+		{
+			
+		}
 		;
 		
-relation_and_exp: relation_exp{printf("relation_and_exp -> relation_exp\n");}
-		| relation_exp relation_exps{printf("relation_and_exp -> relation_exp relation_exps\n");}
+relation_and_exp: relation_exp
+		{
+			
+		}
+		| relation_exp relation_exps
+		{
+			
+		}
 		;
 
-relation_exps: AND relation_exp {printf("relation_exps -> AND relation_exp\n");}
-		| AND relation_exp relation_exps {printf("relation_exps -> AND relation_exp relation_exps\n");}
+relation_exps: AND relation_exp
+		{
+			
+		}
+		| AND relation_exp relation_exps
+		{
+			
+		}
 		;
 
-relation_exp:	expression comp expression{printf("relation_exp -> expression comp expression\n");}
-		| NOT expression comp expression{printf("relation_exp -> NOT expression comp expression\n");}
-		| TRUE{printf("relation_exp -> TRUE\n");}
-		| NOT TRUE{printf("relation_exp -> NOT TRUE\n");}
-		| FALSE{printf("relation_exp -> FALSE\n");}
-		| NOT FALSE{printf("relation_exp -> NOT FALSE\n");}
-		| L_PAREN bool_exp R_PAREN{printf("relation_exp -> L_PAREN bool_exp R_PAREN\n");}
-		| NOT L_PAREN bool_exp R_PAREN{printf("relation_exp -> NOT L_PAREN bool_exp R_PAREN\n");} 
+relation_exp:	expression comp expression
+		{
+			
+		}
+		| NOT expression comp expression
+		{
+			
+		}
+		| TRUE
+		{
+			
+		}
+		| NOT TRUE
+		{
+			
+		}
+		| FALSE
+		{
+			
+		}
+		| NOT FALSE
+		{
+			
+		}
+		| L_PAREN bool_exp R_PAREN
+		{
+			
+		}
+		| NOT L_PAREN bool_exp R_PAREN
+		{
+			
+		}
 		;
 
 comp:		EQ		{$$.code = "==";}
@@ -270,40 +319,112 @@ comp:		EQ		{$$.code = "==";}
 		|	GTE		{$$.code = ">=";}
 		;
 
-expressions:	expression{printf("expressions -> expression\n");}
-		| expression COMMA expressions{printf("expressions -> expression COMMA expressions\n");}
+expressions:	expression
+		{
+			
+		}
+		| expression COMMA expressions
+		{
+			
+		}
 		;
 
-expression:	multiplicative_expression{printf("expression -> multiplicative_expression\n");}
-		| multiplicative_expressions multiplicative_expression {printf("expression -> multiplicative_expressions multiplicative_expression\n");}
+expression:	multiplicative_expression
+		{
+			
+		}
+		| multiplicative_expressions multiplicative_expression
+		{
+			
+		}
 		;
 
-multiplicative_expressions:  multiplicative_expression ADD{printf("multiplicative_expressions -> multiplicative_expression ADD\n");}
-		| multiplicative_expression SUB{printf("multiplicative_expressions -> multiplicative_expression SUB\n");}
-		| multiplicative_expressions ADD multiplicative_expression {printf("multiplicative_expressions -> multiplicative_expressions ADD multiplicative_expression\n");}
-		| multiplicative_expressions SUB multiplicative_expression {printf("multiplicative_expressions -> multiplicative_expressions SUB multiplicative_expression\n");}
+multiplicative_expressions:  multiplicative_expression ADD
+		{
+			
+		}
+		| multiplicative_expression SUB
+		{
+			
+		}
+		| multiplicative_expressions ADD multiplicative_expression
+		{
+			
+		}
+		| multiplicative_expressions SUB multiplicative_expression
+		{
+			
+		}
 		;
 
-multiplicative_expression: term{printf("multiplicative_expression -> term\n");}
-		| terms term {printf("multiplicative_expression -> terms term\n");}
+multiplicative_expression: term
+		{
+			
+		}
+		| terms term
+		{
+			
+		}
 		; 
 		
-terms:  term MULT {printf("terms -> term MULT\n");}
-		| term DIV {printf("terms -> term DIV\n");}
-		| term MOD {printf("terms -> term MOD\n");}
-		| terms MULT term {printf("terms -> terms MULT term\n");}
-		| terms DIV term {printf("terms -> terms DIV term\n");}
-		| terms MOD term {printf("terms -> terms MOD term\n");}
+terms:  term MULT
+		{
+			
+		}
+		| term DIV
+		{
+			
+		}
+		| term MOD
+		{
+			
+		}
+		| terms MULT term
+		{
+			
+		}
+		| terms DIV term
+		{
+			
+		}
+		| terms MOD term
+		{
+			
+		}
 		;
 
-term:	var{printf("term -> var\n");}
-		| SUB var %prec UMINUS{printf("term -> SUB var\n");}
-		| NUMBER{printf("term -> NUMBER\n");}
-		| SUB NUMBER %prec UMINUS{printf("term -> SUB NUMBER\n");}
-		| L_PAREN expression R_PAREN{printf("term -> L_PAREN expression R_PAREN\n");}
-		| SUB L_PAREN expression R_PAREN %prec UMINUS{printf("term -> SUB L_PAREN expression R_PAREN\n");}
-		| IDENT L_PAREN R_PAREN{printf("term -> IDENT L_PAREN R_PAREN\n");}
-		| IDENT L_PAREN expressions R_PAREN{printf("term -> IDENT L_PAREN expressions R_PAREN\n");}
+term:	var
+		{
+			
+		}
+		| SUB var %prec UMINUS
+		{
+			
+		}
+		| NUMBER
+		{
+			
+		}
+		| SUB NUMBER %prec UMINUS
+		{
+			
+		}
+		| L_PAREN expression R_PAREN
+		{
+			
+		}
+		| SUB L_PAREN expression R_PAREN %prec UMINUS
+		{
+			
+		}
+		| IDENT L_PAREN R_PAREN
+		{
+			
+		}
+		| IDENT L_PAREN expressions R_PAREN
+		{
+			
+		}
 		;
 
 
