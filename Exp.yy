@@ -162,12 +162,12 @@ identifiers:	IDENT
 		{ 
 		  $$.push_back($1); 
 		}
-		| IDENT COMMA identifiers
+		| identifiers COMMA IDENT  
 		{ 
-		  $$.push_back($1);
-		  for(list<string>::iterator it = $3.begin(); it != $3.end(); it++){
+		  for(list<string>::iterator it = $1.begin(); it != $1.end(); it++){
 				$$.push_back(*it);
 		  }
+		  $$.push_back($1);
 		}
 		;
 
@@ -223,12 +223,12 @@ vars:	var
 		{
 			$$.var_list.push_back($1);
 		}
-		| var COMMA vars
+		| vars COMMA var
 		{
-			$$.var_list.push_back($1);
-			for(list<string>::iterator it = $3.var_list.begin(); it != $3.var_list.end(); it++){
+			for(list<string>::iterator it = $1.var_list.begin(); it != $1.var_list.end(); it++){
 				$$.var_list.push_back(*it);
 			}
+			$$.var_list.push_back($3);
 		}
 		;
 		
@@ -249,17 +249,17 @@ bool_exp:	relation_and_exp
 		{
 			
 		}
-		| relation_and_exp relation_and_exps
+		| relation_and_exps relation_and_exp
 		{
 			
 		}
 		;
 
-relation_and_exps: OR relation_and_exp
+relation_and_exps: relation_and_exp OR
 		{
 			
 		}
-		| OR relation_and_exp relation_and_exps
+		| relation_and_exps OR relation_and_exp
 		{
 			
 		}
@@ -269,17 +269,17 @@ relation_and_exp: relation_exp
 		{
 			
 		}
-		| relation_exp relation_exps
+		| relation_exps relation_exp 
 		{
 			
 		}
 		;
 
-relation_exps: AND relation_exp
+relation_exps: relation_exp AND
 		{
 			
 		}
-		| AND relation_exp relation_exps
+		| relation_exps AND relation_exp
 		{
 			
 		}
@@ -295,27 +295,32 @@ relation_exp:	expression comp expression
 		}
 		| TRUE
 		{
-			
+			$$ = "true";
 		}
 		| NOT TRUE
 		{
-			
+			$$ = "false";
 		}
 		| FALSE
 		{
-			
+			$$ = "false";
 		}
 		| NOT FALSE
 		{
-			
+			$$ = "true";
 		}
 		| L_PAREN bool_exp R_PAREN
 		{
-			
+			$$ = bool_exp;
 		}
 		| NOT L_PAREN bool_exp R_PAREN
 		{
-			
+			if(bool_exp == "true") {
+				$$ = "false";
+			}
+			else {
+				$$ = "true";
+			} 
 		}
 		;
 
