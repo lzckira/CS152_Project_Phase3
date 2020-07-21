@@ -1,0 +1,14 @@
+function main;
+beginparams
+ a, b : integer;
+endparams
+beginlocals
+	n, m : integer;
+	l : array [20] of integer;
+	fib_n : integer;
+endlocals
+beginbody
+	read n, m;
+	fib_n := n + m;
+	write fib_n;
+endbody

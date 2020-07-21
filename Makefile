@@ -1,5 +1,6 @@
-parse: phase2.lex phase2.y
-	rm -f lex.yy.c y.tab.* y.output *.o parser
-	bison -v -d --file-prefix=y phase2.y
-	flex phase2.lex
-	gcc -o parser y.tab.c lex.yy.c -lfl
+parse: phase3.lex phase3.yy
+	bison -v -d --file-prefix=parser phase3.yy
+	flex phase3.lex
+	g++ -std=c++11 -o parser parser.tab.cc lex.yy.c -lfl
+clean:
+	rm -f lex.yy.c parser.tab.* parser.output *.o parser location.hh position.hh stack.hh 

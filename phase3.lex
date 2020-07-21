@@ -12,10 +12,6 @@ static yy::location loc;
 #define YY_USER_ACTION loc.columns(yyleng);
 %}
 
-	/* your definitions here */
-
-	/* your definitions end */
-
 LETTER  [a-zA-Z]
 DIGIT [0-9]
 
@@ -41,7 +37,7 @@ beginlocals	{return yy::parser::make_BEGIN_LOCALS(loc);}
 endlocals	{return yy::parser::make_END_LOCALS(loc);}
 beginbody	{return yy::parser::make_BEGIN_BODY(loc);}
 endbody		{return yy::parser::make_END_BODY(loc);}
-integer		{return yy::parser::make_INTETER(loc);}
+integer		{return yy::parser::make_INTEGER(loc);}
 array		{return yy::parser::make_ARRAY(loc);}
 of		{return yy::parser::make_OF(loc);}
 if		{return yy::parser::make_IF(loc);}
@@ -69,14 +65,14 @@ return		{return yy::parser::make_RETURN(loc);}
 "=="		{return yy::parser::make_EQ(loc);}
 "<>"		{return yy::parser::make_NEQ(loc);}
 "<"		{return yy::parser::make_LT(loc);}
-">"		{return yy::parser::make_RT(loc);}
+">"		{return yy::parser::make_GT(loc);}
 "<="		{return yy::parser::make_LTE(loc);}
-">="		{return yy::parser::make_RTE(loc);}
+">="		{return yy::parser::make_GTE(loc);}
 
 {LETTER}({LETTER}|{DIGIT})*((_)+({LETTER}|{DIGIT})+)* 			{return yy::parser::make_IDENT(yytext,loc);}
 ({DIGIT}|_)+{LETTER}({LETTER}|{DIGIT})*((_)+({LETTER}|{DIGIT})+)*(_)*  	{printf("Error at %d: identifier \"%s\" must begin with a letter\n", loc, yytext); exit(0);}
 {LETTER}({LETTER}|{DIGIT})*((_)+({LETTER}|{DIGIT})+)*(_)+ 		{printf("Error at %d: identifier \"%s\" cannot end with an underscore\n", loc, yytext); exit(0);}
-{DIGIT}+   								{return yy::parser::make_NUMBER(text_to_int(yytext),loc);}
+{DIGIT}+   								{return yy::parser::make_NUMBER(atoi(yytext),loc);}
 
 
 ";"		{return yy::parser::make_SEMICOLON(loc);}
@@ -89,8 +85,8 @@ return		{return yy::parser::make_RETURN(loc);}
 ":="		{return yy::parser::make_ASSIGN(loc);}
 
 "\n"		{loc.lines(yyleng);loc.step();}
-[ \t]+		{loc.step();}
-(##(.)*\n)	{loc.lines(yyleng);loc.step();}
+[ \t]+		{}
+(##(.)*)	{}
 
  <<EOF>>	{return yy::parser::make_END(loc);}
 	/* your rules end */
