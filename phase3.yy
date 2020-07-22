@@ -248,19 +248,19 @@ statement:	var ASSIGN expression
 			$$.code += "?:= " + $$.first + ", " + $2.code + "\n";
 			$$.code += ":= " + $$.second + "\n";
 			$$.code += ": " + $$.first + "\n";
+			whileloop_flag = true;
 			$$.code += $4.code;
 			$$.code += "?:= " + $$.first + ", " + $2.code + "\n";
-			$$.code += ":= " + $$.second + "\n";
+			whileloop_flag = false;
+			$$.code += ": " + $$.second + "\n";
 		}
 		| DO BEGINLOOP statements ENDLOOP WHILE bool_exp{
 			$$.first = newLabel();
-                        $$.second = newLabel();
 			$$.code += ": " + $$.first + "\n";
-			$$.code += $3.code;
-			$$.code += $6.code;
+			doloop_flag = true;
+			$$.code += $3.code + $6.code;
 			$$.code += "?:= " + $$.first + ", " + $6.code + "\n";
-			$$.code += ":= " + $$.second + "\n";
-			$$.code += ": " + $$.second + "\n";
+			doloop_flag = false;
 		}
 		| READ vars{
 			for(auto i : $2){
@@ -289,7 +289,11 @@ statement:	var ASSIGN expression
 			}
 		}
 		| CONTINUE{
-			$$.code = "continue\n";	
+			if(loop_flag >= 1 || whileloop_flag || doloop_flag){
+				$$.code = "continue\n";	
+			}else{
+			/*error9*/
+			}
 		}
 		| RETURN expression{
 			$$.position = newPosition();
