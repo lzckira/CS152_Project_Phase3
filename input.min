@@ -9,6 +9,6 @@ beginlocals
 endlocals
 beginbody
 	read n, m;
-	fib_n := n + m;
+	fib_n := m + n;
 	write fib_n;
 endbody

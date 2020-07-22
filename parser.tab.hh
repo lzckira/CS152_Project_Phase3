@@ -57,18 +57,33 @@
 		list<string> ids;
 	};
 	
-	struct var_struct {
-		bool array;
-		int index;
-		string id;
+	struct exp_struct {
+		string code;
+		string position;
 	};
 	
-	struct vars_struct {
-		list<var_struct> var_list;
+	struct var_struct {
+		bool array;
+		string code;
+		string position;
 	};
+	
+	struct statement_struct {
+		string code;
+		string first;
+		string second;
+	};
+	
+	struct term_struct {
+		bool negative;
+		string code;
+		string position;
+		list<var_struct> id_list;
+	};
+	
 	/* end the structures for non-terminal types */
 
-#line 72 "parser.tab.hh" // lalr1.cc:377
+#line 87 "parser.tab.hh" // lalr1.cc:377
 
 
 # include <cstdlib> // std::abort
@@ -145,7 +160,7 @@
 
 
 namespace yy {
-#line 149 "parser.tab.hh" // lalr1.cc:377
+#line 164 "parser.tab.hh" // lalr1.cc:377
 
 
 
@@ -296,31 +311,38 @@ namespace yy {
       // declaration
       char dummy1[sizeof(dec_struct)];
 
+      // bool_exp
+      // relation_and_exp
+      // relation_exp
+      // expressions
+      // expression
+      // multiplicative_expression
+      char dummy2[sizeof(exp_struct)];
+
       // NUMBER
-      char dummy2[sizeof(int)];
+      char dummy3[sizeof(int)];
 
       // identifiers
-      char dummy3[sizeof(list<string>)];
+      char dummy4[sizeof(list<string>)];
+
+      // vars
+      char dummy5[sizeof(list<var_struct>)];
+
+      // statements
+      // statement
+      char dummy6[sizeof(statement_struct)];
 
       // IDENT
       // program
       // function
-      // statements
-      // statement
       // comp
-      // expressions
-      // expression
-      // multiplicative_expressions
-      // multiplicative_expression
-      // terms
+      char dummy7[sizeof(string)];
+
       // term
-      char dummy4[sizeof(string)];
+      char dummy8[sizeof(term_struct)];
 
       // var
-      char dummy5[sizeof(var_struct)];
-
-      // vars
-      char dummy6[sizeof(vars_struct)];
+      char dummy9[sizeof(var_struct)];
 };
 
     /// Symbol semantic values.
@@ -433,15 +455,21 @@ namespace yy {
 
   basic_symbol (typename Base::kind_type t, const dec_struct v, const location_type& l);
 
+  basic_symbol (typename Base::kind_type t, const exp_struct v, const location_type& l);
+
   basic_symbol (typename Base::kind_type t, const int v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const list<string> v, const location_type& l);
 
+  basic_symbol (typename Base::kind_type t, const list<var_struct> v, const location_type& l);
+
+  basic_symbol (typename Base::kind_type t, const statement_struct v, const location_type& l);
+
   basic_symbol (typename Base::kind_type t, const string v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const var_struct v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const term_struct v, const location_type& l);
 
-  basic_symbol (typename Base::kind_type t, const vars_struct v, const location_type& l);
+  basic_symbol (typename Base::kind_type t, const var_struct v, const location_type& l);
 
 
       /// Constructor for symbols with semantic value.
@@ -781,7 +809,7 @@ namespace yy {
     // Tables.
   // YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
   // STATE-NUM.
-  static const short int yypact_[];
+  static const signed char yypact_[];
 
   // YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
   // Performed when YYTABLE does not specify something else to do.  Zero
@@ -797,9 +825,9 @@ namespace yy {
   // YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
   // positive, shift that token.  If negative, reduce the rule whose
   // number is the opposite.  If YYTABLE_NINF, syntax error.
-  static const short int yytable_[];
+  static const unsigned char yytable_[];
 
-  static const short int yycheck_[];
+  static const signed char yycheck_[];
 
   // YYSTOS[STATE-NUM] -- The (internal number of the) accessing
   // symbol of state STATE-NUM.
@@ -919,8 +947,8 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 282,     ///< Last index in yytable_.
-      yynnts_ = 23,  ///< Number of nonterminal symbols.
+      yylast_ = 145,     ///< Last index in yytable_.
+      yynnts_ = 19,  ///< Number of nonterminal symbols.
       yyfinal_ = 6, ///< Termination state number.
       yyterror_ = 1,
       yyerrcode_ = 256,
@@ -1009,6 +1037,15 @@ namespace yy {
         value.copy< dec_struct > (other.value);
         break;
 
+      case 64: // bool_exp
+      case 65: // relation_and_exp
+      case 66: // relation_exp
+      case 68: // expressions
+      case 69: // expression
+      case 70: // multiplicative_expression
+        value.copy< exp_struct > (other.value);
+        break;
+
       case 50: // NUMBER
         value.copy< int > (other.value);
         break;
@@ -1017,27 +1054,28 @@ namespace yy {
         value.copy< list<string> > (other.value);
         break;
 
+      case 62: // vars
+        value.copy< list<var_struct> > (other.value);
+        break;
+
+      case 60: // statements
+      case 61: // statement
+        value.copy< statement_struct > (other.value);
+        break;
+
       case 4: // IDENT
       case 55: // program
       case 56: // function
-      case 60: // statements
-      case 61: // statement
-      case 69: // comp
-      case 70: // expressions
-      case 71: // expression
-      case 72: // multiplicative_expressions
-      case 73: // multiplicative_expression
-      case 74: // terms
-      case 75: // term
+      case 67: // comp
         value.copy< string > (other.value);
+        break;
+
+      case 71: // term
+        value.copy< term_struct > (other.value);
         break;
 
       case 63: // var
         value.copy< var_struct > (other.value);
-        break;
-
-      case 62: // vars
-        value.copy< vars_struct > (other.value);
         break;
 
       default:
@@ -1062,6 +1100,15 @@ namespace yy {
         value.copy< dec_struct > (v);
         break;
 
+      case 64: // bool_exp
+      case 65: // relation_and_exp
+      case 66: // relation_exp
+      case 68: // expressions
+      case 69: // expression
+      case 70: // multiplicative_expression
+        value.copy< exp_struct > (v);
+        break;
+
       case 50: // NUMBER
         value.copy< int > (v);
         break;
@@ -1070,27 +1117,28 @@ namespace yy {
         value.copy< list<string> > (v);
         break;
 
+      case 62: // vars
+        value.copy< list<var_struct> > (v);
+        break;
+
+      case 60: // statements
+      case 61: // statement
+        value.copy< statement_struct > (v);
+        break;
+
       case 4: // IDENT
       case 55: // program
       case 56: // function
-      case 60: // statements
-      case 61: // statement
-      case 69: // comp
-      case 70: // expressions
-      case 71: // expression
-      case 72: // multiplicative_expressions
-      case 73: // multiplicative_expression
-      case 74: // terms
-      case 75: // term
+      case 67: // comp
         value.copy< string > (v);
+        break;
+
+      case 71: // term
+        value.copy< term_struct > (v);
         break;
 
       case 63: // var
         value.copy< var_struct > (v);
-        break;
-
-      case 62: // vars
-        value.copy< vars_struct > (v);
         break;
 
       default:
@@ -1116,6 +1164,13 @@ namespace yy {
   {}
 
   template <typename Base>
+  parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const exp_struct v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
   parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const int v, const location_type& l)
     : Base (t)
     , value (v)
@@ -1130,6 +1185,20 @@ namespace yy {
   {}
 
   template <typename Base>
+  parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const list<var_struct> v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
+  parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const statement_struct v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
   parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const string v, const location_type& l)
     : Base (t)
     , value (v)
@@ -1137,14 +1206,14 @@ namespace yy {
   {}
 
   template <typename Base>
-  parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const var_struct v, const location_type& l)
+  parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const term_struct v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
   {}
 
   template <typename Base>
-  parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const vars_struct v, const location_type& l)
+  parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const var_struct v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -1181,6 +1250,15 @@ namespace yy {
         value.template destroy< dec_struct > ();
         break;
 
+      case 64: // bool_exp
+      case 65: // relation_and_exp
+      case 66: // relation_exp
+      case 68: // expressions
+      case 69: // expression
+      case 70: // multiplicative_expression
+        value.template destroy< exp_struct > ();
+        break;
+
       case 50: // NUMBER
         value.template destroy< int > ();
         break;
@@ -1189,27 +1267,28 @@ namespace yy {
         value.template destroy< list<string> > ();
         break;
 
+      case 62: // vars
+        value.template destroy< list<var_struct> > ();
+        break;
+
+      case 60: // statements
+      case 61: // statement
+        value.template destroy< statement_struct > ();
+        break;
+
       case 4: // IDENT
       case 55: // program
       case 56: // function
-      case 60: // statements
-      case 61: // statement
-      case 69: // comp
-      case 70: // expressions
-      case 71: // expression
-      case 72: // multiplicative_expressions
-      case 73: // multiplicative_expression
-      case 74: // terms
-      case 75: // term
+      case 67: // comp
         value.template destroy< string > ();
+        break;
+
+      case 71: // term
+        value.template destroy< term_struct > ();
         break;
 
       case 63: // var
         value.template destroy< var_struct > ();
-        break;
-
-      case 62: // vars
-        value.template destroy< vars_struct > ();
         break;
 
       default:
@@ -1240,6 +1319,15 @@ namespace yy {
         value.move< dec_struct > (s.value);
         break;
 
+      case 64: // bool_exp
+      case 65: // relation_and_exp
+      case 66: // relation_exp
+      case 68: // expressions
+      case 69: // expression
+      case 70: // multiplicative_expression
+        value.move< exp_struct > (s.value);
+        break;
+
       case 50: // NUMBER
         value.move< int > (s.value);
         break;
@@ -1248,27 +1336,28 @@ namespace yy {
         value.move< list<string> > (s.value);
         break;
 
+      case 62: // vars
+        value.move< list<var_struct> > (s.value);
+        break;
+
+      case 60: // statements
+      case 61: // statement
+        value.move< statement_struct > (s.value);
+        break;
+
       case 4: // IDENT
       case 55: // program
       case 56: // function
-      case 60: // statements
-      case 61: // statement
-      case 69: // comp
-      case 70: // expressions
-      case 71: // expression
-      case 72: // multiplicative_expressions
-      case 73: // multiplicative_expression
-      case 74: // terms
-      case 75: // term
+      case 67: // comp
         value.move< string > (s.value);
+        break;
+
+      case 71: // term
+        value.move< term_struct > (s.value);
         break;
 
       case 63: // var
         value.move< var_struct > (s.value);
-        break;
-
-      case 62: // vars
-        value.move< vars_struct > (s.value);
         break;
 
       default:
@@ -1645,7 +1734,7 @@ namespace yy {
 
 
 } // yy
-#line 1649 "parser.tab.hh" // lalr1.cc:377
+#line 1738 "parser.tab.hh" // lalr1.cc:377
 
 
 

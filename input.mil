@@ -1,4 +1,4 @@
-func main
++func main
 . a
 . b
 = a, $0
@@ -7,8 +7,4 @@ func main
 . m
 .[] l, 20
 . fib_n
-= n, $2
-= m, $3
-= l, $4
-= fib_n, $5
 endfunc
