@@ -204,10 +204,13 @@ statements: 	{$$.code = "";}
 
 statement:	var ASSIGN expression
 		{
+			$$.code += $3.code;
 			if($1.array == true) {
-				$$.code += $3.code;
+				$$.code += "[]= " + $1.position + ", " + $3.position + "\n";
 			}
-			$$.code += "[]= " + $1.position + ", " + $3.position + "\n";
+			else {
+				$$.code += "= " + $1.position + ", " + $3.position + "\n";
+			}
 		}
 		| IF bool_exp THEN statements ENDIF{
 			$$.first = newLabel();
@@ -301,13 +304,11 @@ vars:	var
 var:	IDENT
 		{ 
 			$$.array = false;
-			$$.code = ". " + $1 + "\n";
 			$$.position = $1;
 		}
 		| IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET
 		{
 			$$.array = true;
-			$$.code = ".[] " + $1 + ", " + $3.position + "\n";
 			$$.position = $1 + ", " + $3.position;
 		}
 		;
@@ -437,7 +438,7 @@ expression:	multiplicative_expression
 multiplicative_expression: term
 		{
 			$$.position = $1.position;
-			$$.code += $1.code;
+			$$.code = $1.code;
 		}
 		| multiplicative_expression MULT term
 		{
@@ -470,7 +471,7 @@ term:	var
 				$$.code += "= " + $$.position + ", " + $1.position + "\n";
 			}
 			else {
-				$$.code += "[]= " + $$.position + ", " + $1.position + "\n";
+				$$.code += "=[] " + $$.position + ", " + $1.position + "\n";
 			}
 			$$.id_list.push_back($1);
 		}

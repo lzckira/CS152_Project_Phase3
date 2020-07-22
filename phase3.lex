@@ -58,7 +58,7 @@ true		{return yy::parser::make_TRUE(loc);}
 false		{return yy::parser::make_FALSE(loc);}
 return		{return yy::parser::make_RETURN(loc);}
 "-"		{return yy::parser::make_SUB(loc);}
-"="		{return yy::parser::make_ADD(loc);}
+"+"		{return yy::parser::make_ADD(loc);}
 "*"		{return yy::parser::make_MULT(loc);}
 "/"		{return yy::parser::make_DIV(loc);}
 "%"		{return yy::parser::make_MOD(loc);}

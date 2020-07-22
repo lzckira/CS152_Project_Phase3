@@ -1,10 +1,15 @@
-+func main
-. a
-. b
-= a, $0
-= b, $1
+func main
 . n
 . m
-.[] l, 20
 . fib_n
+.< n
+.< m
+. __temp__2
+. __temp__0
+= __temp__0, n
+. __temp__1
+= __temp__1, m
++ __temp__2, __temp__0, __temp__1
+= fib_n, __temp__2
+.> fib_n
 endfunc
