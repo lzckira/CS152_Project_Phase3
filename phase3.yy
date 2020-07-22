@@ -38,6 +38,12 @@
 		string position;
 	};
 	
+	struct statement_struct {
+		string code;
+		string first;
+		string second;
+	};
+	
 	struct term_struct {
 		bool negative;
 		string code;
@@ -71,15 +77,17 @@ yy::parser::symbol_type yylex();
 
 	extern yy::location loc;
 	int positionCount = 0;
-	string newPosition(string &a) {
-		string temp = ". " + "__temp__" + to_string(positionCount);
+	string newPosition() {
+		string temp = "__temp__" + to_string(positionCount);
 		positionCount++;
 		return temp;
 	}
 	
-	int labels_number = 0;
-	string labels(){
-		return "__label__" + to_string(label_number++)；
+	int labelCount = 0;
+	string newLabel(){
+		string temp = "__label__" + to_string(labelCount)；
+		labelCount++;
+		return temp;
 	}
 	
 	/* end of your code */
@@ -95,9 +103,10 @@ yy::parser::symbol_type yylex();
 %token EQ NEQ LT GT LTE GTE
 %token SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN
 %token <int> NUMBER
-%type <string> IDENT program function statements statement comp
+%type <string> IDENT program function comp
 %type <dec_struct> declarations declaration
 %type <var_struct> var
+%type <statement_struct> statements statement
 %type <list<var_struct>> vars
 %type <list<string>> identifiers
 %type <exp_struct> expression expressions multiplicative_expressions multiplicative_expression 
@@ -211,44 +220,45 @@ statement:	var ASSIGN expression
 			$$.code += "[]= " + $1.position + ", " + $3.position + "\n";
 		}
 		| IF bool_exp THEN statements ENDIF{
-			$$.first = labels();
-			$$.code = "?:= " + $$.first + ", " + $2.code + "\n";
-			$$.code = ": " + $$.first + "\n";
-			$$.code = $4.code;
+			$$.first = newLabel();
+			$$.code += "?:= " + $$.first + ", " + $2.code + "\n";
+			$$.code += ": " + $$.first + "\n";
+			$$.code += $4.code;
 		}
 		| IF bool_exp THEN statements ELSE statements ENDIF{
-			$$.first = labels();
-			$$.second = labels();
-			$$.code = "?:= " + $$.first + ", " + $2.code + "\n";
-			$$.code = $6.code;
-			$$.code = ":= " + $$.second + "\n";
-			$$.code = ": " + $$.first + "\n";
-			$$.code = $4.code;
-			$$.code = ": " + $$.second + "\n";
+			$$.first = newLabel();
+			$$.second = newLabel();
+			$$.code += "?:= " + $$.first + ", " + $2.code + "\n";
+			$$.code += $6.code;
+			$$.code += ":= " + $$.second + "\n";
+			$$.code += ": " + $$.first + "\n";
+			$$.code += $4.code;
+			$$.code += ": " + $$.second + "\n";
 		}
 		| WHILE bool_exp BEGINLOOP statements ENDLOOP{
-			$$.first = labels();
-                        $$.second = labels();
-			$$.code = "?:= " + $$.first + ", " + $2.code + "\n";
-			$$.code = ":= " + $$.second + "\n";
-			$$.code = ": " + $$.first + "\n";
-			$$.code = $2.code;
-			$$.code = "?:= " + $$.first + ", " + $2.code + "\n";
-			$$.code = ":= " + $$.second + "\n";
+			$$.first = newLabel();
+                        $$.second = newLabel();
+			$$.code += "?:= " + $$.first + ", " + $2.code + "\n";
+			$$.code += ":= " + $$.second + "\n";
+			$$.code += ": " + $$.first + "\n";
+			$$.code += $2.code;
+			$$.code += "?:= " + $$.first + ", " + $2.code + "\n";
+			$$.code += ":= " + $$.second + "\n";
 		}
 		| DO BEGINLOOP statements ENDLOOP WHILE bool_exp{
-			$$.first = labels();
-                        $$.second = labels();
-			$$.code = ": " + $$.first + "\n";
-			$$.code = $3.code;
-			$$.code = $6.code;
-			$$.code = "?:= " + $$.first + ", " + $6.code + "\n";
-			$$.code = ":= " + $$.second + "\n";
-			$$.code = ": " + $$.second + "\n";
+			$$.first = newLabel();
+                        $$.second = newLabel();
+			$$.code += ": " + $$.first + "\n";
+			$$.code += $3.code;
+			$$.code += $6.code;
+			$$.code += "?:= " + $$.first + ", " + $6.code + "\n";
+			$$.code += ":= " + $$.second + "\n";
+			$$.code += ": " + $$.second + "\n";
 		}
 		| READ vars{
 			for(auto i : $2){
-				$$.code += newPosition($$.position);
+				$$.position = newPosition();
+				$$.code = ". " + $$.position + "\n";
 				$$.code += i.code;
 				if (i.array == false) {
 					$$.code += ".< " + i.position + "\n";
@@ -260,7 +270,8 @@ statement:	var ASSIGN expression
 		}
 		| WRITE vars{
 			for(auto i : $2){
-				$$.code += newPosition($$.position);
+				$$.position = newPosition();
+				$$.code = ". " + $$.position + "\n";
 				$$.code += i.code;
 				if (i.array == false) {
 					$$.code += ".> " + i.position + "\n";
@@ -274,7 +285,8 @@ statement:	var ASSIGN expression
 			/*ganmayongde?*/	
 		}
 		| RETURN expression{
-			$$.code = newPosition($$.position);
+			$$.position = newPosition();
+			$$.code = ". " + $$.position + "\n";
 			$$.code = $2.code + "ret " + $2.position + "\n";
 		}
 		| var error expression{
@@ -315,7 +327,8 @@ bool_exp:	relation_and_exp
                         $$.code = $1.code;	
 		}
 		| relation_and_exps OR relation_and_exp{
-			$$.code = newPosition($$.position);
+			$$.position = newPosition();
+			$$.code = ". " + $$.position + "\n";
                         $$.code += $1.code + $3.code;
                         $$.code += "|| " + $$.position + ", " + $1.position + ", " + $3.position + "\n";	
 		}
@@ -326,7 +339,8 @@ relation_and_exp: relation_exp{
 			$$.code = $1.code;
 		}
 		| relation_and_exp AND relation_exp{
-			$$.code = newPosition($$.position);
+			$$.position = newPosition();
+			$$.code = ". " + $$.position + "\n";
 			$$.code += $1.code + $3.code;
 			$$.code += "&& " + $$.position + ", " + $1.position + ", " + $3.position + "\n";
 		}
@@ -334,13 +348,15 @@ relation_and_exp: relation_exp{
 
 relation_exp:	expression comp expression
 		{
-			$$.code = newPosition($$.position);
+			$$.position = newPosition();
+			$$.code = ". " + $$.position + "\n";
 			$$.code += $1.code + $3.code;
 			$$.code += $2 + " " + $$.position + ", " + $1.position + ", " + $3.position + "\n";
 		}
 		| NOT expression comp expression
 		{
-			$$.code = newPosition($$.position);
+			$$.position = newPosition();
+			$$.code = ". " + $$.position + "\n";
 			$$.code += $1.code + $3.code;
 			$$.code += $2 + " " + $$.position + ", " + $1.position + ", " + $3.position + "\n";
 			$$.code += "! " + $$.position + ", " + $$.position + "\n";
@@ -404,13 +420,15 @@ expression:	multiplicative_expression
 		}
 		| multiplicative_expressions ADD multiplicative_expression
 		{
-			$$.code = newPosition($$.position);
+			$$.position = newPosition();
+			$$.code = ". " + $$.position + "\n";
 			$$.code += $1.code + $3.code;
 			$$.code += "+ " + $$.position + ", " + $1.position + ", " + $3.position + "\n";
 		}
 		| multiplicative_expressions SUB multiplicative_expression
 		{
-			$$.code = newPosition($$.position);
+			$$.position = newPosition();
+			$$.code = ". " + $$.position + "\n";
 			$$.code += $1.code + $3.code;
 			$$.code += "- " + $$.position + ", " + $1.position + ", " + $3.position + "\n";
 		}
@@ -423,19 +441,22 @@ multiplicative_expression: term
 		}
 		| multiplicative_expression MULT term
 		{
-			$$.code = newPosition($$.position);
+			$$.position = newPosition();
+			$$.code = ". " + $$.position + "\n";
 			$$.code += $1.code + $3.code;
 			$$.code += "* " + $$.position + ", " + $1.position + ", " + $3.position + "\n";
 		}
 		| multiplicative_expression DIV term
 		{
-			$$.code = newPosition($$.position);
+			$$.position = newPosition();
+			$$.code = ". " + $$.position + "\n";
 			$$.code += $1.code + $3.code;
 			$$.code += "/ " + $$.position + ", " + $1.position + ", " + $3.position + "\n";
 		}
 		| multiplicative_expression MOD term
 		{
-			$$.code = newPosition($$.position);
+			$$.position = newPosition();
+			$$.code = ". " + $$.position + "\n";
 			$$.code += $1.code + $3.code;
 			$$.code += "% " + $$.position + ", " + $1.position + ", " + $3.position + "\n";
 		}
@@ -443,7 +464,8 @@ multiplicative_expression: term
 
 term:	var
 		{
-			$$.code = newPosition($$.position);
+			$$.position = newPosition();
+			$$.code = ". " + $$.position + "\n";
 			if($1.array == false) {
 				$$.code += "= " + $$.position + ", " + $1.position + "\n";
 			}
@@ -454,7 +476,8 @@ term:	var
 		}
 		| SUB var %prec UMINUS
 		{
-			$$.code = newPosition($$.position);
+			$$.position = newPosition();
+			$$.code = ". " + $$.position + "\n";
 			if($1.array == false) {
 				$$.code += "- " + $$.position + ", 0, " + $1.position + "\n";
 			}
@@ -466,12 +489,14 @@ term:	var
 		}
 		| NUMBER
 		{
-			$$.code = newPosition($$.position);
+			$$.position = newPosition();
+			$$.code = ". " + $$.position + "\n";
 			$$.code += "= " + $$.position + ", " + $1 + "\n";
 		}
 		| SUB NUMBER %prec UMINUS
 		{
-			$$.code = newPosition($$.position);
+			$$.position = newPosition();
+			$$.code = ". " + $$.position + "\n";
 			$$.code += "- " + $$.position + ", 0, " + $1.position + "\n";
 			$$.negative = true;
 		}
@@ -489,12 +514,14 @@ term:	var
 		}
 		| IDENT L_PAREN R_PAREN
 		{
-			$$.code = newPosition($$.position);
+			$$.position = newPosition();
+			$$.code = ". " + $$.position + "\n";
 			$$.code += "call " + $1.code + ", " + $$.position + "\n";
 		}
 		| IDENT L_PAREN expressions R_PAREN
 		{
-			$$.code = newPosition($$.position);
+			$$.position = newPosition();
+			$$.code = ". " + $$.position + "\n";
 			$$.code += $3.code;
 			$$.code += "param " + $3.position + "\n";
 			$$.code += "call " + $1.code + ", " + $$.position + "\n";
