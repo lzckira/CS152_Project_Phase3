@@ -27,15 +27,23 @@
 		list<string> ids;
 	};
 	
+	struct exp_struct {
+		string code;
+		string position;
+	}
+	
 	struct var_struct {
 		bool array;
-		int index;
-		string id;
+		string code;
+		string position;
 	};
 	
-	struct vars_struct {
-		list<var_struct> var_list;
-	};
+	struct term_struct {
+		bool negative;
+		string code;
+		string position;
+		list<var_struct> id_list;
+	}
 	/* end the structures for non-terminal types */
 }
 
@@ -61,10 +69,14 @@ yy::parser::symbol_type yylex();
 	
 	bool loop_bool = false;
 
-	int temp_number = 0;
-	string temps(string &temp){
-		return "__temp__" + to_string(temp_number++) + "\n";
+	extern yy::location loc;
+	int positionCount = 0;
+	string newPosition(string &a) {
+		string temp = ". " + "__temp__" + to_string(positionCount);
+		positionCount++;
+		return temp;
 	}
+	
 	int labels_number = 0;
 	string labels(){
 		return "__label__" + to_string(label_number++)
@@ -83,13 +95,14 @@ yy::parser::symbol_type yylex();
 %token EQ NEQ LT GT LTE GTE
 %token SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN
 %token <int> NUMBER
-%type <string> IDENT
-%type <string> program function statements statement comp
+%type <string> IDENT program function statements statement comp
 %type <dec_struct> declarations declaration
-%type <list<string>> identifiers
 %type <var_struct> var
-%type <vars_struct> vars
-%type <string> expressions expression multiplicative_expressions multiplicative_expression terms term
+%type <list<var_struct>> vars
+%type <list<string>> identifiers
+%type <exp_struct> expression expressions multiplicative_expressions multiplicative_expression 
+%type <exp_struct> relation_exp bool_exp relation_and_exp
+%type <term_struct> terms term
 %token ERROR
 %right UMINUS	
 
@@ -171,12 +184,12 @@ identifiers:	IDENT
 		{ 
 		  $$.push_back($1); 
 		}
-		| IDENT COMMA identifiers
+		| identifiers COMMA IDENT  
 		{ 
-		  $$.push_back($1);
-		  for(list<string>::iterator it = $3.begin(); it != $3.end(); it++){
+		  for(list<string>::iterator it = $1.begin(); it != $1.end(); it++){
 				$$.push_back(*it);
 		  }
+		  $$.push_back($3);
 		}
 		;
 
@@ -191,7 +204,11 @@ statements: 	{$$ = "";}
 
 statement:	var ASSIGN expression
 		{
-			/* $$.code = "= " + $1 + ", " + $3 + "\n"; */
+			$$.code += newPosition($$.position);
+			if($$.array == true) {
+				$$.code += $3.code;
+			}
+			$$.code += "[]= " + $1.position + ", " + $3.position + "\n";
 		}
 		| IF bool_exp THEN statements ENDIF{
 			$$.first = labels();
@@ -230,15 +247,27 @@ statement:	var ASSIGN expression
 			$$.code = ": " + $$.second + "\n";
 		}
 		| READ vars{
-			for(list<var_struct>::iterator it = $2.var_list.begin(); it != $2.var_list.end(); it++){
-				/*$$ += ".< " + *it.id + "\n";*/
-				cout << *it << endl;
+			for(auto i : $2){
+				$$.code += newPosition($$.position);
+				$$.code += i.code;
+				if (i.array == false) {
+					$$.code += ".< " + i.position + "\n";
+				}
+				else {
+					$$.code += ".[]< " + i.position + "\n";
+				}
 			}
-
 		}
 		| WRITE vars{
-			for(list<var_struct>::iterator it = $2.var_list.begin(); it != $2.var_list.end(); it++){
-				/*$$ += ".> " + *it.id + "\n";*/
+			for(auto i : $2){
+				$$.code += newPosition($$.position);
+				$$.code += i.code;
+				if (i.array == false) {
+					$$.code += ".> " + i.position + "\n";
+				}
+				else {
+					$$.code += ".[]> " + i.position + "\n";
+				}
 			}
 		}
 		| CONTINUE{
@@ -254,27 +283,28 @@ statement:	var ASSIGN expression
 		
 vars:	var
 		{
-			$$.var_list.push_back($1);
+			$$.push_back($1);
 		}
-		| var COMMA vars
+		| vars COMMA var
 		{
-			$$.var_list.push_back($1);
-			for(list<string>::iterator it = $3.var_list.begin(); it != $3.var_list.end(); it++){
-				$$.var_list.push_back(*it);
+			for(auto i : $1){
+				$$.push_back(i);
 			}
+			$$.push_back($3);
 		}
 		;
 		
 var:	IDENT
 		{ 
 			$$.array = false;
-			$$.id = $1;
+			$$.code = ". " + $1 + "\n"
+			$$.position = $1;
 		}
 		| IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET
 		{
 			$$.array = true;
-			$$.id = $1 + "[" + $3 + "]";
-			$$.index = $3;
+			$$.code = ".[] " + $1 + ", " + $3 + "\n"
+			$$.position = $1 + ", " + $3;
 		}
 		;
 
@@ -282,17 +312,7 @@ bool_exp:	relation_and_exp
 		{
 			
 		}
-		| relation_and_exp relation_and_exps
-		{
-			
-		}
-		;
-
-relation_and_exps: OR relation_and_exp
-		{
-			
-		}
-		| OR relation_and_exp relation_and_exps
+		| relation_and_exps OR relation_and_exp
 		{
 			
 		}
@@ -302,17 +322,7 @@ relation_and_exp: relation_exp
 		{
 			
 		}
-		| relation_exp relation_exps
-		{
-			
-		}
-		;
-
-relation_exps: AND relation_exp
-		{
-			
-		}
-		| AND relation_exp relation_exps
+		| relation_and_exp AND relation_exp 
 		{
 			
 		}
@@ -320,35 +330,45 @@ relation_exps: AND relation_exp
 
 relation_exp:	expression comp expression
 		{
-			
+			$$.code = newPosition($$.position);
+			$$.code += $1.code + $3.code;
+			$$.code += $2 + " " + $$.position + ", " + $1.position + ", " + $3.position + "\n";
 		}
 		| NOT expression comp expression
 		{
-			
+			$$.code = newPosition($$.position);
+			$$.code += $1.code + $3.code;
+			$$.code += $2 + " " + $$.position + ", " + $1.position + ", " + $3.position + "\n";
+			$$.code += "! " + $$.position + ", " + $$.position + "\n";
 		}
 		| TRUE
 		{
-			
+			$$.code = "1";
 		}
 		| NOT TRUE
 		{
-			
+			$$.code = "0";
 		}
 		| FALSE
 		{
-			
+			$$.code = "0";
 		}
 		| NOT FALSE
 		{
-			
+			$$.code = "1";
 		}
 		| L_PAREN bool_exp R_PAREN
 		{
-			
+			$$.code = $2;
 		}
 		| NOT L_PAREN bool_exp R_PAREN
 		{
-			
+			if($3 == "true") {
+				$$ = "false";
+			}
+			else {
+				$$ = "true";
+			} 
 		}
 		;
 
@@ -362,112 +382,120 @@ comp:		EQ		{$$ = "==";}
 
 expressions:	expression
 		{
-			
+			$$.push_back($1);
 		}
-		| expression COMMA expressions
+		| expressions COMMA expression
 		{
-			
+			for(list<string>::iterator it = $1.begin(); it != $1.end(); it++){
+			    $$.push_back(*it);
+			}
+			$$.push_back($3);
 		}
 		;
 
 expression:	multiplicative_expression
 		{
-			
-		}
-		| multiplicative_expressions multiplicative_expression
-		{
-			
-		}
-		;
-
-multiplicative_expressions:  multiplicative_expression ADD
-		{
-			
-		}
-		| multiplicative_expression SUB
-		{
-			
+			$$.position = $1.position;
+			$$.code = $1.code;
 		}
 		| multiplicative_expressions ADD multiplicative_expression
 		{
-			
+			$$.code = newPosition($$.position);
+			$$.code += $1.code + $3.code;
+			$$.code += "+ " + $$.position + ", " + $1.position + ", " + $3.position + "\n";
 		}
 		| multiplicative_expressions SUB multiplicative_expression
 		{
-			
+			$$.code = newPosition($$.position);
+			$$.code += $1.code + $3.code;
+			$$.code += "- " + $$.position + ", " + $1.position + ", " + $3.position + "\n";
 		}
 		;
 
 multiplicative_expression: term
 		{
-			
+			$$.position = $1.position;
+			$$.code += $1.code;
 		}
-		| terms term
+		| multiplicative_expression MULT term
 		{
-			
+			$$.code = newPosition($$.position);
+			$$.code += $1.code + $3.code;
+			$$.code += "* " + $$.position + ", " + $1.position + ", " + $3.position + "\n";
+		}
+		| multiplicative_expression DIV term
+		{
+			$$.code = newPosition($$.position);
+			$$.code += $1.code + $3.code;
+			$$.code += "/ " + $$.position + ", " + $1.position + ", " + $3.position + "\n";
+		}
+		| multiplicative_expression MOD term
+		{
+			$$.code = newPosition($$.position);
+			$$.code += $1.code + $3.code;
+			$$.code += "% " + $$.position + ", " + $1.position + ", " + $3.position + "\n";
 		}
 		; 
-		
-terms:  term MULT
-		{
-			
-		}
-		| term DIV
-		{
-			
-		}
-		| term MOD
-		{
-			
-		}
-		| terms MULT term
-		{
-			
-		}
-		| terms DIV term
-		{
-			
-		}
-		| terms MOD term
-		{
-			
-		}
-		;
 
 term:	var
 		{
-			
+			$$.code = newPosition($$.position);
+			if($1.array == false) {
+				$$.code += "= " + $$.position + ", " + $1.position + "\n";
+			}
+			else {
+				$$.code += "[]= " + $$.position + ", " + $1.position + "\n";
+			}
+			$$.id_list.push_back($1);
 		}
 		| SUB var %prec UMINUS
 		{
-			
+			$$.code = newPosition($$.position);
+			if($1.array == false) {
+				$$.code += "- " + $$.position + ", 0, " + $1.position + "\n";
+			}
+			else {
+				$$.code += "[]= " + $$.position + ", " + $1.position + "\n";
+				$$.code += "- " + $$.position + ", 0, " + $$.position + "\n";
+			}
+			$$.id_list.push_back($1);
 		}
 		| NUMBER
 		{
-			
+			$$.code = newPosition($$.position);
+			$$.code += "= " + $$.position + ", " + $1 + "\n";
 		}
 		| SUB NUMBER %prec UMINUS
 		{
-			
+			$$.code = newPosition($$.position);
+			$$.code += "- " + $$.position + ", 0, " + $1.position + "\n";
+			$$.negative = true;
 		}
 		| L_PAREN expression R_PAREN
 		{
-			
+			$$.code = $2.code;
+			$$.position = $2.position;
+			$$.negative = false;
 		}
 		| SUB L_PAREN expression R_PAREN %prec UMINUS
 		{
-			
+			$$.code = $2.code;
+			$$.position = $2.position;
+			$$.code += "- " + $$.position + ", 0, " + $$.position + "\n";	
 		}
 		| IDENT L_PAREN R_PAREN
 		{
-			
+			$$.code = newPosition($$.position);
+			$$.code += "call " + $1.code + ", " + $$.position + "\n";
 		}
 		| IDENT L_PAREN expressions R_PAREN
 		{
-			
+			$$.code = newPosition($$.position);
+			$$.code += $3.code;
+			$$.code += "param " + $3.position + "\n";
+			$$.code += "call " + $1.code + ", " + $$.position + "\n";
 		}
 		;
-
 
 
 
