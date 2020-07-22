@@ -73,7 +73,9 @@ yy::parser::symbol_type yylex();
 	
 	extern yy::location loc;
 	
-	bool loop_bool = false;
+	int loop_flag = 0;
+	bool whileloop_flag;
+	bool doloop_flag;
 
 	extern yy::location loc;
 	int positionCount = 0;
@@ -222,18 +224,23 @@ statement:	var ASSIGN expression
 		| IF bool_exp THEN statements ENDIF{
 			$$.first = newLabel();
 			$$.code += "?:= " + $$.first + ", " + $2.code + "\n";
+			loop_flag++;
 			$$.code += ": " + $$.first + "\n";
 			$$.code += $4.code;
+			loop_flag--;
 		}
 		| IF bool_exp THEN statements ELSE statements ENDIF{
 			$$.first = newLabel();
 			$$.second = newLabel();
 			$$.code += "?:= " + $$.first + ", " + $2.code + "\n";
+			loop_flag++;
 			$$.code += $6.code;
 			$$.code += ":= " + $$.second + "\n";
 			$$.code += ": " + $$.first + "\n";
+			loop_flag++;
 			$$.code += $4.code;
 			$$.code += ": " + $$.second + "\n";
+			loop_flag--;
 		}
 		| WHILE bool_exp BEGINLOOP statements ENDLOOP{
 			$$.first = newLabel();
@@ -241,7 +248,7 @@ statement:	var ASSIGN expression
 			$$.code += "?:= " + $$.first + ", " + $2.code + "\n";
 			$$.code += ":= " + $$.second + "\n";
 			$$.code += ": " + $$.first + "\n";
-			$$.code += $2.code;
+			$$.code += $4.code;
 			$$.code += "?:= " + $$.first + ", " + $2.code + "\n";
 			$$.code += ":= " + $$.second + "\n";
 		}
