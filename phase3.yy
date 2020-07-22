@@ -282,7 +282,7 @@ statement:	var ASSIGN expression
 			}
 		}
 		| CONTINUE{
-			/*ganmayongde?*/	
+			$$.code = "continue\n";	
 		}
 		| RETURN expression{
 			$$.position = newPosition();
