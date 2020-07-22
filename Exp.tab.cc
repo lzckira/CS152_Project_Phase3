@@ -51,7 +51,7 @@
 
 #line 53 "Exp.tab.cc" // lalr1.cc:412
 // Unqualified %code blocks.
-#line 44 "Exp.yy" // lalr1.cc:413
+#line 41 "Exp.yy" // lalr1.cc:413
 
 #include "Exp.tab.hh"
 
@@ -283,6 +283,10 @@ namespace yy {
         value.move< list<string> > (that.value);
         break;
 
+      case 62: // vars
+        value.move< list<var_struct> > (that.value);
+        break;
+
       case 4: // IDENT
       case 55: // program
       case 56: // function
@@ -305,10 +309,6 @@ namespace yy {
 
       case 63: // var
         value.move< var_struct > (that.value);
-        break;
-
-      case 62: // vars
-        value.move< vars_struct > (that.value);
         break;
 
       default:
@@ -339,6 +339,10 @@ namespace yy {
         value.copy< list<string> > (that.value);
         break;
 
+      case 62: // vars
+        value.copy< list<var_struct> > (that.value);
+        break;
+
       case 4: // IDENT
       case 55: // program
       case 56: // function
@@ -361,10 +365,6 @@ namespace yy {
 
       case 63: // var
         value.copy< var_struct > (that.value);
-        break;
-
-      case 62: // vars
-        value.copy< vars_struct > (that.value);
         break;
 
       default:
@@ -608,6 +608,10 @@ namespace yy {
         yylhs.value.build< list<string> > ();
         break;
 
+      case 62: // vars
+        yylhs.value.build< list<var_struct> > ();
+        break;
+
       case 4: // IDENT
       case 55: // program
       case 56: // function
@@ -632,10 +636,6 @@ namespace yy {
         yylhs.value.build< var_struct > ();
         break;
 
-      case 62: // vars
-        yylhs.value.build< vars_struct > ();
-        break;
-
       default:
         break;
     }
@@ -654,25 +654,25 @@ namespace yy {
           switch (yyn)
             {
   case 2:
-#line 99 "Exp.yy" // lalr1.cc:859
+#line 96 "Exp.yy" // lalr1.cc:859
     {if(no_error) cout << yystack_[0].value.as< string > ();}
 #line 660 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 3:
-#line 102 "Exp.yy" // lalr1.cc:859
+#line 99 "Exp.yy" // lalr1.cc:859
     {yylhs.value.as< string > () = "";}
 #line 666 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 4:
-#line 103 "Exp.yy" // lalr1.cc:859
+#line 100 "Exp.yy" // lalr1.cc:859
     {yylhs.value.as< string > () = yystack_[1].value.as< string > () + "\n" + yystack_[0].value.as< string > ();}
 #line 672 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 5:
-#line 107 "Exp.yy" // lalr1.cc:859
+#line 104 "Exp.yy" // lalr1.cc:859
     {
 			yylhs.value.as< string > () = "func " + yystack_[10].value.as< string > () + "\n";
 			yylhs.value.as< string > () += yystack_[7].value.as< dec_struct > ().code;
@@ -693,13 +693,13 @@ namespace yy {
     break;
 
   case 6:
-#line 125 "Exp.yy" // lalr1.cc:859
+#line 122 "Exp.yy" // lalr1.cc:859
     {yylhs.value.as< dec_struct > ().code=""; yylhs.value.as< dec_struct > ().ids=list<string>();}
 #line 699 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 7:
-#line 126 "Exp.yy" // lalr1.cc:859
+#line 123 "Exp.yy" // lalr1.cc:859
     {
 			yylhs.value.as< dec_struct > ().code = yystack_[2].value.as< dec_struct > ().code + yystack_[1].value.as< dec_struct > ().code;
 			for(list<string>::iterator it = yystack_[2].value.as< dec_struct > ().ids.begin(); it != yystack_[2].value.as< dec_struct > ().ids.end(); it++){
@@ -713,7 +713,7 @@ namespace yy {
     break;
 
   case 8:
-#line 135 "Exp.yy" // lalr1.cc:859
+#line 132 "Exp.yy" // lalr1.cc:859
     {
 			/*error*/
 		}
@@ -721,7 +721,7 @@ namespace yy {
     break;
 
   case 9:
-#line 141 "Exp.yy" // lalr1.cc:859
+#line 138 "Exp.yy" // lalr1.cc:859
     {
 			for(list<string>::iterator it = yystack_[2].value.as< list<string> > ().begin(); it != yystack_[2].value.as< list<string> > ().end(); it++){
 			    yylhs.value.as< dec_struct > ().code += ". " + *it + "\n";
@@ -732,7 +732,7 @@ namespace yy {
     break;
 
   case 10:
-#line 148 "Exp.yy" // lalr1.cc:859
+#line 145 "Exp.yy" // lalr1.cc:859
     { 
 			for(list<string>::iterator it = yystack_[7].value.as< list<string> > ().begin(); it != yystack_[7].value.as< list<string> > ().end(); it++){
 			    yylhs.value.as< dec_struct > ().code += ".[] " + *it + ", " + to_string(yystack_[3].value.as< int > ()) + "\n";
@@ -743,7 +743,7 @@ namespace yy {
     break;
 
   case 11:
-#line 154 "Exp.yy" // lalr1.cc:859
+#line 151 "Exp.yy" // lalr1.cc:859
     {
 			/*error*/	
 		}
@@ -751,7 +751,7 @@ namespace yy {
     break;
 
   case 12:
-#line 157 "Exp.yy" // lalr1.cc:859
+#line 154 "Exp.yy" // lalr1.cc:859
     {
 			/*error*/
 		}
@@ -759,7 +759,7 @@ namespace yy {
     break;
 
   case 13:
-#line 162 "Exp.yy" // lalr1.cc:859
+#line 159 "Exp.yy" // lalr1.cc:859
     { 
 		  yylhs.value.as< list<string> > ().push_back(yystack_[0].value.as< string > ()); 
 		}
@@ -767,7 +767,7 @@ namespace yy {
     break;
 
   case 14:
-#line 166 "Exp.yy" // lalr1.cc:859
+#line 163 "Exp.yy" // lalr1.cc:859
     { 
 		  for(list<string>::iterator it = yystack_[2].value.as< list<string> > ().begin(); it != yystack_[2].value.as< list<string> > ().end(); it++){
 				yylhs.value.as< list<string> > ().push_back(*it);
@@ -778,13 +778,13 @@ namespace yy {
     break;
 
   case 15:
-#line 174 "Exp.yy" // lalr1.cc:859
+#line 171 "Exp.yy" // lalr1.cc:859
     {yylhs.value.as< string > () = "";}
 #line 784 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 16:
-#line 175 "Exp.yy" // lalr1.cc:859
+#line 172 "Exp.yy" // lalr1.cc:859
     {
 			yylhs.value.as< string > () = yystack_[2].value.as< string > () + yystack_[0].value.as< string > ();
 		}
@@ -792,7 +792,7 @@ namespace yy {
     break;
 
   case 17:
-#line 178 "Exp.yy" // lalr1.cc:859
+#line 175 "Exp.yy" // lalr1.cc:859
     {
 			/*error*/
 		}
@@ -800,7 +800,7 @@ namespace yy {
     break;
 
   case 18:
-#line 184 "Exp.yy" // lalr1.cc:859
+#line 181 "Exp.yy" // lalr1.cc:859
     {
 			/* $$.code = "= " + $1 + ", " + $3 + "\n"; */
 		}
@@ -808,7 +808,7 @@ namespace yy {
     break;
 
   case 19:
-#line 187 "Exp.yy" // lalr1.cc:859
+#line 184 "Exp.yy" // lalr1.cc:859
     {
 		
 		}
@@ -816,7 +816,7 @@ namespace yy {
     break;
 
   case 20:
-#line 190 "Exp.yy" // lalr1.cc:859
+#line 187 "Exp.yy" // lalr1.cc:859
     {
 
 		}
@@ -824,7 +824,7 @@ namespace yy {
     break;
 
   case 21:
-#line 193 "Exp.yy" // lalr1.cc:859
+#line 190 "Exp.yy" // lalr1.cc:859
     {
 
 		}
@@ -832,7 +832,7 @@ namespace yy {
     break;
 
   case 22:
-#line 196 "Exp.yy" // lalr1.cc:859
+#line 193 "Exp.yy" // lalr1.cc:859
     {
 
 		}
@@ -840,452 +840,467 @@ namespace yy {
     break;
 
   case 23:
-#line 199 "Exp.yy" // lalr1.cc:859
+#line 196 "Exp.yy" // lalr1.cc:859
     {
-			for(list<var_struct>::iterator it = yystack_[0].value.as< vars_struct > ().var_list.begin(); it != yystack_[0].value.as< vars_struct > ().var_list.end(); it++){
-				/*$$ += ".< " + *it.id + "\n";*/
-				cout << *it << endl;
+			/*for(list<vars_struct>::iterator it = $2.var_list.begin(); it != $2.var_list.end(); it++){
+				$$ += ".< " + *it.id + "\n";
+			}*/
+			for(auto i : yystack_[0].value.as< list<var_struct> > ()){
+				if (i.array == false) {
+					yylhs.value.as< string > () += ".< " + i.id + "\n";
+				}
+				else {
+					yylhs.value.as< string > () += ".[]< " + i.id + ", " + i.index + "\n";
+				}
 			}
 
 		}
-#line 852 "Exp.tab.cc" // lalr1.cc:859
+#line 859 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 24:
-#line 206 "Exp.yy" // lalr1.cc:859
+#line 210 "Exp.yy" // lalr1.cc:859
     {
-			for(list<var_struct>::iterator it = yystack_[0].value.as< vars_struct > ().var_list.begin(); it != yystack_[0].value.as< vars_struct > ().var_list.end(); it++){
-				/*$$ += ".> " + *it.id + "\n";*/
+			/*for(list<vars_structe>::iterator it = $2.var_list.begin(); it != $2.var_list.end(); it++){
+				$$ += ".> " + *it.id + "\n";
+			}*/
+			for(auto i : yystack_[0].value.as< list<var_struct> > ()){
+				if (i.array == false) {
+					yylhs.value.as< string > () += ".> " + i.id + "\n";
+				}
+				else {
+					yylhs.value.as< string > () += ".[]> " + i.id + ", " + i.index + "\n";
+				}
 			}
 		}
-#line 862 "Exp.tab.cc" // lalr1.cc:859
+#line 877 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 25:
-#line 211 "Exp.yy" // lalr1.cc:859
+#line 223 "Exp.yy" // lalr1.cc:859
     {
 
 		}
-#line 870 "Exp.tab.cc" // lalr1.cc:859
+#line 885 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 26:
-#line 214 "Exp.yy" // lalr1.cc:859
+#line 226 "Exp.yy" // lalr1.cc:859
     {
 
 		}
-#line 878 "Exp.tab.cc" // lalr1.cc:859
+#line 893 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 27:
-#line 217 "Exp.yy" // lalr1.cc:859
+#line 229 "Exp.yy" // lalr1.cc:859
     {
 			/*error*/
 		}
-#line 886 "Exp.tab.cc" // lalr1.cc:859
+#line 901 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 28:
-#line 223 "Exp.yy" // lalr1.cc:859
-    {
-			yylhs.value.as< vars_struct > ().var_list.push_back(yystack_[0].value.as< var_struct > ());
+#line 235 "Exp.yy" // lalr1.cc:859
+    { 
+			yylhs.value.as< list<var_struct> > ().push_back(yystack_[0].value.as< var_struct > ());
 		}
-#line 894 "Exp.tab.cc" // lalr1.cc:859
+#line 909 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 29:
-#line 227 "Exp.yy" // lalr1.cc:859
+#line 239 "Exp.yy" // lalr1.cc:859
     {
-			for(list<string>::iterator it = yystack_[2].value.as< vars_struct > ().var_list.begin(); it != yystack_[2].value.as< vars_struct > ().var_list.end(); it++){
-				yylhs.value.as< vars_struct > ().var_list.push_back(*it);
+			for(auto i : yystack_[2].value.as< list<var_struct> > ()){
+				yylhs.value.as< list<var_struct> > ().push_back(i);
 			}
-			yylhs.value.as< vars_struct > ().var_list.push_back(yystack_[0].value.as< var_struct > ());
+			yylhs.value.as< list<var_struct> > ().push_back(yystack_[0].value.as< var_struct > ());
 		}
-#line 905 "Exp.tab.cc" // lalr1.cc:859
+#line 920 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 30:
-#line 236 "Exp.yy" // lalr1.cc:859
+#line 248 "Exp.yy" // lalr1.cc:859
     { 
 			yylhs.value.as< var_struct > ().array = false;
 			yylhs.value.as< var_struct > ().id = yystack_[0].value.as< string > ();
 		}
-#line 914 "Exp.tab.cc" // lalr1.cc:859
+#line 929 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 31:
-#line 241 "Exp.yy" // lalr1.cc:859
+#line 253 "Exp.yy" // lalr1.cc:859
     {
 			yylhs.value.as< var_struct > ().array = true;
 			yylhs.value.as< var_struct > ().id = yystack_[3].value.as< string > () + "[" + yystack_[1].value.as< string > () + "]";
 			yylhs.value.as< var_struct > ().index = yystack_[1].value.as< string > ();
 		}
-#line 924 "Exp.tab.cc" // lalr1.cc:859
+#line 939 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 32:
-#line 249 "Exp.yy" // lalr1.cc:859
+#line 261 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 932 "Exp.tab.cc" // lalr1.cc:859
+#line 947 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 33:
-#line 253 "Exp.yy" // lalr1.cc:859
+#line 265 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 940 "Exp.tab.cc" // lalr1.cc:859
+#line 955 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 34:
-#line 259 "Exp.yy" // lalr1.cc:859
+#line 271 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 948 "Exp.tab.cc" // lalr1.cc:859
+#line 963 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 35:
-#line 263 "Exp.yy" // lalr1.cc:859
+#line 275 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 956 "Exp.tab.cc" // lalr1.cc:859
+#line 971 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 36:
-#line 269 "Exp.yy" // lalr1.cc:859
+#line 281 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 964 "Exp.tab.cc" // lalr1.cc:859
+#line 979 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 37:
-#line 273 "Exp.yy" // lalr1.cc:859
+#line 285 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 972 "Exp.tab.cc" // lalr1.cc:859
+#line 987 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 38:
-#line 279 "Exp.yy" // lalr1.cc:859
+#line 291 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 980 "Exp.tab.cc" // lalr1.cc:859
+#line 995 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 39:
-#line 283 "Exp.yy" // lalr1.cc:859
+#line 295 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 988 "Exp.tab.cc" // lalr1.cc:859
+#line 1003 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 40:
-#line 289 "Exp.yy" // lalr1.cc:859
+#line 301 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 996 "Exp.tab.cc" // lalr1.cc:859
+#line 1011 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 41:
-#line 293 "Exp.yy" // lalr1.cc:859
+#line 305 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 1004 "Exp.tab.cc" // lalr1.cc:859
+#line 1019 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 42:
-#line 297 "Exp.yy" // lalr1.cc:859
-    {
-			yylhs.value.as< string > () = "true";
-		}
-#line 1012 "Exp.tab.cc" // lalr1.cc:859
-    break;
-
-  case 43:
-#line 301 "Exp.yy" // lalr1.cc:859
-    {
-			yylhs.value.as< string > () = "false";
-		}
-#line 1020 "Exp.tab.cc" // lalr1.cc:859
-    break;
-
-  case 44:
-#line 305 "Exp.yy" // lalr1.cc:859
-    {
-			yylhs.value.as< string > () = "false";
-		}
-#line 1028 "Exp.tab.cc" // lalr1.cc:859
-    break;
-
-  case 45:
 #line 309 "Exp.yy" // lalr1.cc:859
     {
 			yylhs.value.as< string > () = "true";
 		}
-#line 1036 "Exp.tab.cc" // lalr1.cc:859
+#line 1027 "Exp.tab.cc" // lalr1.cc:859
+    break;
+
+  case 43:
+#line 313 "Exp.yy" // lalr1.cc:859
+    {
+			yylhs.value.as< string > () = "false";
+		}
+#line 1035 "Exp.tab.cc" // lalr1.cc:859
+    break;
+
+  case 44:
+#line 317 "Exp.yy" // lalr1.cc:859
+    {
+			yylhs.value.as< string > () = "false";
+		}
+#line 1043 "Exp.tab.cc" // lalr1.cc:859
+    break;
+
+  case 45:
+#line 321 "Exp.yy" // lalr1.cc:859
+    {
+			yylhs.value.as< string > () = "true";
+		}
+#line 1051 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 46:
-#line 313 "Exp.yy" // lalr1.cc:859
+#line 325 "Exp.yy" // lalr1.cc:859
     {
-			yylhs.value.as< string > () = bool_exp;
+			yylhs.value.as< string > () = yystack_[1].value.as< string > ();
 		}
-#line 1044 "Exp.tab.cc" // lalr1.cc:859
+#line 1059 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 47:
-#line 317 "Exp.yy" // lalr1.cc:859
+#line 329 "Exp.yy" // lalr1.cc:859
     {
-			if(bool_exp == "true") {
+			if(yystack_[1].value.as< string > () == "true") {
 				yylhs.value.as< string > () = "false";
 			}
 			else {
 				yylhs.value.as< string > () = "true";
 			} 
 		}
-#line 1057 "Exp.tab.cc" // lalr1.cc:859
+#line 1072 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 48:
-#line 327 "Exp.yy" // lalr1.cc:859
+#line 339 "Exp.yy" // lalr1.cc:859
     {yylhs.value.as< string > () = "==";}
-#line 1063 "Exp.tab.cc" // lalr1.cc:859
+#line 1078 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 49:
-#line 328 "Exp.yy" // lalr1.cc:859
+#line 340 "Exp.yy" // lalr1.cc:859
     {yylhs.value.as< string > () = "!=";}
-#line 1069 "Exp.tab.cc" // lalr1.cc:859
+#line 1084 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 50:
-#line 329 "Exp.yy" // lalr1.cc:859
+#line 341 "Exp.yy" // lalr1.cc:859
     {yylhs.value.as< string > () = "<";}
-#line 1075 "Exp.tab.cc" // lalr1.cc:859
+#line 1090 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 51:
-#line 330 "Exp.yy" // lalr1.cc:859
+#line 342 "Exp.yy" // lalr1.cc:859
     {yylhs.value.as< string > () = ">";}
-#line 1081 "Exp.tab.cc" // lalr1.cc:859
+#line 1096 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 52:
-#line 331 "Exp.yy" // lalr1.cc:859
+#line 343 "Exp.yy" // lalr1.cc:859
     {yylhs.value.as< string > () = "<=";}
-#line 1087 "Exp.tab.cc" // lalr1.cc:859
+#line 1102 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 53:
-#line 332 "Exp.yy" // lalr1.cc:859
+#line 344 "Exp.yy" // lalr1.cc:859
     {yylhs.value.as< string > () = ">=";}
-#line 1093 "Exp.tab.cc" // lalr1.cc:859
+#line 1108 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 54:
-#line 336 "Exp.yy" // lalr1.cc:859
+#line 348 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 1101 "Exp.tab.cc" // lalr1.cc:859
+#line 1116 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 55:
-#line 340 "Exp.yy" // lalr1.cc:859
+#line 352 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 1109 "Exp.tab.cc" // lalr1.cc:859
+#line 1124 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 56:
-#line 346 "Exp.yy" // lalr1.cc:859
+#line 358 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 1117 "Exp.tab.cc" // lalr1.cc:859
+#line 1132 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 57:
-#line 350 "Exp.yy" // lalr1.cc:859
+#line 362 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 1125 "Exp.tab.cc" // lalr1.cc:859
+#line 1140 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 58:
-#line 356 "Exp.yy" // lalr1.cc:859
-    {
-			
-		}
-#line 1133 "Exp.tab.cc" // lalr1.cc:859
-    break;
-
-  case 59:
-#line 360 "Exp.yy" // lalr1.cc:859
-    {
-			
-		}
-#line 1141 "Exp.tab.cc" // lalr1.cc:859
-    break;
-
-  case 60:
-#line 364 "Exp.yy" // lalr1.cc:859
-    {
-			
-		}
-#line 1149 "Exp.tab.cc" // lalr1.cc:859
-    break;
-
-  case 61:
 #line 368 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 1157 "Exp.tab.cc" // lalr1.cc:859
+#line 1148 "Exp.tab.cc" // lalr1.cc:859
+    break;
+
+  case 59:
+#line 372 "Exp.yy" // lalr1.cc:859
+    {
+			
+		}
+#line 1156 "Exp.tab.cc" // lalr1.cc:859
+    break;
+
+  case 60:
+#line 376 "Exp.yy" // lalr1.cc:859
+    {
+			
+		}
+#line 1164 "Exp.tab.cc" // lalr1.cc:859
+    break;
+
+  case 61:
+#line 380 "Exp.yy" // lalr1.cc:859
+    {
+			
+		}
+#line 1172 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 62:
-#line 374 "Exp.yy" // lalr1.cc:859
+#line 386 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 1165 "Exp.tab.cc" // lalr1.cc:859
+#line 1180 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 63:
-#line 378 "Exp.yy" // lalr1.cc:859
+#line 390 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 1173 "Exp.tab.cc" // lalr1.cc:859
+#line 1188 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 64:
-#line 384 "Exp.yy" // lalr1.cc:859
-    {
-			
-		}
-#line 1181 "Exp.tab.cc" // lalr1.cc:859
-    break;
-
-  case 65:
-#line 388 "Exp.yy" // lalr1.cc:859
-    {
-			
-		}
-#line 1189 "Exp.tab.cc" // lalr1.cc:859
-    break;
-
-  case 66:
-#line 392 "Exp.yy" // lalr1.cc:859
-    {
-			
-		}
-#line 1197 "Exp.tab.cc" // lalr1.cc:859
-    break;
-
-  case 67:
 #line 396 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 1205 "Exp.tab.cc" // lalr1.cc:859
+#line 1196 "Exp.tab.cc" // lalr1.cc:859
     break;
 
-  case 68:
+  case 65:
 #line 400 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 1213 "Exp.tab.cc" // lalr1.cc:859
+#line 1204 "Exp.tab.cc" // lalr1.cc:859
     break;
 
-  case 69:
+  case 66:
 #line 404 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 1221 "Exp.tab.cc" // lalr1.cc:859
+#line 1212 "Exp.tab.cc" // lalr1.cc:859
+    break;
+
+  case 67:
+#line 408 "Exp.yy" // lalr1.cc:859
+    {
+			
+		}
+#line 1220 "Exp.tab.cc" // lalr1.cc:859
+    break;
+
+  case 68:
+#line 412 "Exp.yy" // lalr1.cc:859
+    {
+			
+		}
+#line 1228 "Exp.tab.cc" // lalr1.cc:859
+    break;
+
+  case 69:
+#line 416 "Exp.yy" // lalr1.cc:859
+    {
+			
+		}
+#line 1236 "Exp.tab.cc" // lalr1.cc:859
     break;
 
   case 70:
-#line 410 "Exp.yy" // lalr1.cc:859
-    {
-			
-		}
-#line 1229 "Exp.tab.cc" // lalr1.cc:859
-    break;
-
-  case 71:
-#line 414 "Exp.yy" // lalr1.cc:859
-    {
-			
-		}
-#line 1237 "Exp.tab.cc" // lalr1.cc:859
-    break;
-
-  case 72:
-#line 418 "Exp.yy" // lalr1.cc:859
-    {
-			
-		}
-#line 1245 "Exp.tab.cc" // lalr1.cc:859
-    break;
-
-  case 73:
 #line 422 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 1253 "Exp.tab.cc" // lalr1.cc:859
+#line 1244 "Exp.tab.cc" // lalr1.cc:859
     break;
 
-  case 74:
+  case 71:
 #line 426 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 1261 "Exp.tab.cc" // lalr1.cc:859
+#line 1252 "Exp.tab.cc" // lalr1.cc:859
     break;
 
-  case 75:
+  case 72:
 #line 430 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 1269 "Exp.tab.cc" // lalr1.cc:859
+#line 1260 "Exp.tab.cc" // lalr1.cc:859
     break;
 
-  case 76:
+  case 73:
 #line 434 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 1277 "Exp.tab.cc" // lalr1.cc:859
+#line 1268 "Exp.tab.cc" // lalr1.cc:859
     break;
 
-  case 77:
+  case 74:
 #line 438 "Exp.yy" // lalr1.cc:859
     {
 			
 		}
-#line 1285 "Exp.tab.cc" // lalr1.cc:859
+#line 1276 "Exp.tab.cc" // lalr1.cc:859
+    break;
+
+  case 75:
+#line 442 "Exp.yy" // lalr1.cc:859
+    {
+			
+		}
+#line 1284 "Exp.tab.cc" // lalr1.cc:859
+    break;
+
+  case 76:
+#line 446 "Exp.yy" // lalr1.cc:859
+    {
+			
+		}
+#line 1292 "Exp.tab.cc" // lalr1.cc:859
+    break;
+
+  case 77:
+#line 450 "Exp.yy" // lalr1.cc:859
+    {
+			
+		}
+#line 1300 "Exp.tab.cc" // lalr1.cc:859
     break;
 
 
-#line 1289 "Exp.tab.cc" // lalr1.cc:859
+#line 1304 "Exp.tab.cc" // lalr1.cc:859
             default:
               break;
             }
@@ -1754,14 +1769,14 @@ namespace yy {
   const unsigned short int
   parser::yyrline_[] =
   {
-       0,    99,    99,   102,   103,   106,   125,   126,   135,   140,
-     147,   154,   157,   161,   165,   174,   175,   178,   183,   187,
-     190,   193,   196,   199,   206,   211,   214,   217,   222,   226,
-     235,   240,   248,   252,   258,   262,   268,   272,   278,   282,
-     288,   292,   296,   300,   304,   308,   312,   316,   327,   328,
-     329,   330,   331,   332,   335,   339,   345,   349,   355,   359,
-     363,   367,   373,   377,   383,   387,   391,   395,   399,   403,
-     409,   413,   417,   421,   425,   429,   433,   437
+       0,    96,    96,    99,   100,   103,   122,   123,   132,   137,
+     144,   151,   154,   158,   162,   171,   172,   175,   180,   184,
+     187,   190,   193,   196,   210,   223,   226,   229,   234,   238,
+     247,   252,   260,   264,   270,   274,   280,   284,   290,   294,
+     300,   304,   308,   312,   316,   320,   324,   328,   339,   340,
+     341,   342,   343,   344,   347,   351,   357,   361,   367,   371,
+     375,   379,   385,   389,   395,   399,   403,   407,   411,   415,
+     421,   425,   429,   433,   437,   441,   445,   449
   };
 
   // Print the state stack on the debug stream.
@@ -1796,8 +1811,8 @@ namespace yy {
 
 
 } // yy
-#line 1800 "Exp.tab.cc" // lalr1.cc:1167
-#line 450 "Exp.yy" // lalr1.cc:1168
+#line 1815 "Exp.tab.cc" // lalr1.cc:1167
+#line 462 "Exp.yy" // lalr1.cc:1168
 
 
 int main(int argc, char *argv[])

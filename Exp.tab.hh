@@ -59,16 +59,13 @@
 	
 	struct var_struct {
 		bool array;
-		int index;
+		string index;
 		string id;
 	};
 	
-	struct vars_struct {
-		list<var_struct> var_list;
-	};
 	/* end the structures for non-terminal types */
 
-#line 72 "Exp.tab.hh" // lalr1.cc:377
+#line 69 "Exp.tab.hh" // lalr1.cc:377
 
 
 # include <cstdlib> // std::abort
@@ -145,7 +142,7 @@
 
 
 namespace yy {
-#line 149 "Exp.tab.hh" // lalr1.cc:377
+#line 146 "Exp.tab.hh" // lalr1.cc:377
 
 
 
@@ -302,6 +299,9 @@ namespace yy {
       // identifiers
       char dummy3[sizeof(list<string>)];
 
+      // vars
+      char dummy4[sizeof(list<var_struct>)];
+
       // IDENT
       // program
       // function
@@ -319,13 +319,10 @@ namespace yy {
       // multiplicative_expression
       // terms
       // term
-      char dummy4[sizeof(string)];
+      char dummy5[sizeof(string)];
 
       // var
-      char dummy5[sizeof(var_struct)];
-
-      // vars
-      char dummy6[sizeof(vars_struct)];
+      char dummy6[sizeof(var_struct)];
 };
 
     /// Symbol semantic values.
@@ -442,11 +439,11 @@ namespace yy {
 
   basic_symbol (typename Base::kind_type t, const list<string> v, const location_type& l);
 
+  basic_symbol (typename Base::kind_type t, const list<var_struct> v, const location_type& l);
+
   basic_symbol (typename Base::kind_type t, const string v, const location_type& l);
 
   basic_symbol (typename Base::kind_type t, const var_struct v, const location_type& l);
-
-  basic_symbol (typename Base::kind_type t, const vars_struct v, const location_type& l);
 
 
       /// Constructor for symbols with semantic value.
@@ -1022,6 +1019,10 @@ namespace yy {
         value.copy< list<string> > (other.value);
         break;
 
+      case 62: // vars
+        value.copy< list<var_struct> > (other.value);
+        break;
+
       case 4: // IDENT
       case 55: // program
       case 56: // function
@@ -1044,10 +1045,6 @@ namespace yy {
 
       case 63: // var
         value.copy< var_struct > (other.value);
-        break;
-
-      case 62: // vars
-        value.copy< vars_struct > (other.value);
         break;
 
       default:
@@ -1080,6 +1077,10 @@ namespace yy {
         value.copy< list<string> > (v);
         break;
 
+      case 62: // vars
+        value.copy< list<var_struct> > (v);
+        break;
+
       case 4: // IDENT
       case 55: // program
       case 56: // function
@@ -1102,10 +1103,6 @@ namespace yy {
 
       case 63: // var
         value.copy< var_struct > (v);
-        break;
-
-      case 62: // vars
-        value.copy< vars_struct > (v);
         break;
 
       default:
@@ -1145,6 +1142,13 @@ namespace yy {
   {}
 
   template <typename Base>
+  parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const list<var_struct> v, const location_type& l)
+    : Base (t)
+    , value (v)
+    , location (l)
+  {}
+
+  template <typename Base>
   parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const string v, const location_type& l)
     : Base (t)
     , value (v)
@@ -1153,13 +1157,6 @@ namespace yy {
 
   template <typename Base>
   parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const var_struct v, const location_type& l)
-    : Base (t)
-    , value (v)
-    , location (l)
-  {}
-
-  template <typename Base>
-  parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const vars_struct v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -1204,6 +1201,10 @@ namespace yy {
         value.template destroy< list<string> > ();
         break;
 
+      case 62: // vars
+        value.template destroy< list<var_struct> > ();
+        break;
+
       case 4: // IDENT
       case 55: // program
       case 56: // function
@@ -1226,10 +1227,6 @@ namespace yy {
 
       case 63: // var
         value.template destroy< var_struct > ();
-        break;
-
-      case 62: // vars
-        value.template destroy< vars_struct > ();
         break;
 
       default:
@@ -1268,6 +1265,10 @@ namespace yy {
         value.move< list<string> > (s.value);
         break;
 
+      case 62: // vars
+        value.move< list<var_struct> > (s.value);
+        break;
+
       case 4: // IDENT
       case 55: // program
       case 56: // function
@@ -1290,10 +1291,6 @@ namespace yy {
 
       case 63: // var
         value.move< var_struct > (s.value);
-        break;
-
-      case 62: // vars
-        value.move< vars_struct > (s.value);
         break;
 
       default:
@@ -1670,7 +1667,7 @@ namespace yy {
 
 
 } // yy
-#line 1674 "Exp.tab.hh" // lalr1.cc:377
+#line 1671 "Exp.tab.hh" // lalr1.cc:377
 
 
 
