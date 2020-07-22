@@ -79,7 +79,7 @@ yy::parser::symbol_type yylex();
 	
 	int labels_number = 0;
 	string labels(){
-		return "__label__" + to_string(label_number++)
+		return "__label__" + to_string(label_number++)；
 	}
 	
 	/* end of your code */
