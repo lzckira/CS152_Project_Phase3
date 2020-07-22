@@ -271,10 +271,11 @@ statement:	var ASSIGN expression
 			}
 		}
 		| CONTINUE{
-
+			/*ganmayongde?*/	
 		}
 		| RETURN expression{
-
+			$$.code = newPosition($$.position);
+			$$.code = $2.code + "ret " + $2.position + "\n";
 		}
 		| var error expression{
 			/*error*/
