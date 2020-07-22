@@ -311,21 +311,24 @@ var:	IDENT
 
 bool_exp:	relation_and_exp
 		{
-			
+			$$.position = $1.position;
+                        $$.code = $1.code;	
 		}
-		| relation_and_exps OR relation_and_exp
-		{
-			
+		| relation_and_exps OR relation_and_exp{
+			$$.code = newPosition($$.position);
+                        $$.code += $1.code + $3.code;
+                        $$.code += "|| " + $$.position + ", " + $1.position + ", " + $3.position + "\n";	
 		}
 		;
 		
-relation_and_exp: relation_exp
-		{
-			
+relation_and_exp: relation_exp{
+			$$.position = $1.position;
+			$$.code = $1.code;
 		}
-		| relation_and_exp AND relation_exp 
-		{
-			
+		| relation_and_exp AND relation_exp{
+			$$.code = newPosition($$.position);
+			$$.code += $1.code + $3.code;
+			$$.code += "&& " + $$.position + ", " + $1.position + ", " + $3.position + "\n";
 		}
 		;
 
