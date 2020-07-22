@@ -59,7 +59,16 @@ yy::parser::symbol_type yylex();
 	
 	extern yy::location loc;
 	
-	
+	bool loop_bool = false;
+
+	int temp_number = 0;
+	string temps(string &temp){
+		return "__temp__" + to_string(temp_number++) + "\n";
+	}
+	int labels_number = 0;
+	string labels(){
+		return "__label__" + to_string(label_number++)
+	}
 	
 	/* end of your code */
 }
@@ -185,16 +194,40 @@ statement:	var ASSIGN expression
 			/* $$.code = "= " + $1 + ", " + $3 + "\n"; */
 		}
 		| IF bool_exp THEN statements ENDIF{
-		
+			$$.first = labels();
+			$$.code = "?:= " + $$.first + ", " + $2.code + "\n";
+			$$.code = ": " + $$.first + "\n";
+			$$.code = $4.code;
 		}
 		| IF bool_exp THEN statements ELSE statements ENDIF{
-
+			$$.first = labels();
+			$$.second = labels();
+			$$.code = "?:= " + $$.first + ", " + $2.code + "\n";
+			$$.code = $6.code;
+			$$.code = ":= " + $$.second + "\n";
+			$$.code = ": " + $$.first + "\n";
+			$$.code = $4.code;
+			$$.code = ": " + $$.second + "\n";
 		}
 		| WHILE bool_exp BEGINLOOP statements ENDLOOP{
-
+			$$.first = labels();
+                        $$.second = labels();
+			$$.code = "?:= " + $$.first + ", " + $2.code + "\n";
+			$$.code = ":= " + $$.second + "\n";
+			$$.code = ": " + $$.first + "\n";
+			$$.code = $2.code;
+			$$.code = "?:= " + $$.first + ", " + $2.code + "\n";
+			$$.code = ":= " + $$.second + "\n";
 		}
 		| DO BEGINLOOP statements ENDLOOP WHILE bool_exp{
-
+			$$.first = labels();
+                        $$.second = labels();
+			$$.code = ": " + $$.first + "\n";
+			$$.code = $3.code;
+			$$.code = $6.code;
+			$$.code = "?:= " + $$.first + ", " + $6.code + "\n";
+			$$.code = ":= " + $$.second + "\n";
+			$$.code = ": " + $$.second + "\n";
 		}
 		| READ vars{
 			for(list<var_struct>::iterator it = $2.var_list.begin(); it != $2.var_list.end(); it++){
