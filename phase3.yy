@@ -94,18 +94,16 @@ yy::parser::symbol_type yylex();
 		return temp;
 	}
 	vector <string>  tokenName {
-	"FUNCTION" "IDENT" "BEGIN_PARAMS" "END_PARAMS" "BEGIN_LOCALS" "END_LOCALS" "BEGIN_BODY" "END_BODY" "INTEGER" "ARRAY"
-	"OF" "IF" "THEN" "ENDIF" "ELSE" "WHILE" "DO" "BEGINLOOP" "ENDLOOP" "CONTINUE" "READ" "WRITE" "AND" "OR" "NOT" "TRUE" "FALSE" "RETURN"
-	"SUB" "ADD" "MULT" "DIV" "MOD" "EQ" "NEQ" "LT" "GT" "LTE" "GTE"
-	"SEMICOLON" "COLON" "COMMA" "L_PAREN" "R_PAREN" "L_SQUARE_BRACKET" "R_SQUARE_BRACKET" "ASSIGN"
-	"NUMBER" "ERROR"
-	"function" "ident" "begin_params" "end_params" "begin_locals" "end_locals" "begin_body" "end_body" "integer" "array"
-	"of" "if" "then" "endif" "else" "while" "do" "beginloop" "endloop" "continue" "read" "write" "and" "or" "not" "true" "false" "return"
-	"sub" "add" "mult" "div" "mod" "eq" "neq" "lt" "gt" "lte" "gte"
-	"semicolon" "colon" "comma" "l_paren" "r_paren" "l_square_bracket" "r_square_bracket" "assign"
-	"number" "error"
-	}
-	map <string, int>
+	"FUNCTION", "IDENT", "BEGIN_PARAMS", "END_PARAMS", "BEGIN_LOCALS", "END_LOCALS", "BEGIN_BODY", "END_BODY", "INTEGER", "ARRAY",
+	"OF", "IF", "THEN", "ENDIF", "ELSE", "WHILE", "DO", "BEGINLOOP", "ENDLOOP", "CONTINUE", "READ", "WRITE", "AND", "OR", "NOT", "TRUE", "FALSE", "RETURN",
+	"SUB", "ADD", "MULT", "DIV", "MOD", "EQ", "NEQ", "LT", "GT", "LTE", "GTE",
+	"SEMICOLON", "COLON", "COMMA", "L_PAREN", "R_PAREN", "L_SQUARE_BRACKET", "R_SQUARE_BRACKET", "ASSIGN", "NUMBER", 
+	"function", "ident", "begin_params", "end_params", "begin_locals", "end_locals", "begin_body", "end_body", "integer", "array",
+	"of", "if", "then", "endif", "else", "while", "do", "beginloop", "endloop", "continue", "read", "write", "and", "or", "not", "true", "false", "return",
+	"sub", "add", "mult", "div", "mod", "eq", "neq", "lt", "gt", "lte", "gte",
+	"semicolon", "colon", "comma", "l_paren", "r_paren", "l_square_bracket", "r_square_bracket", "assign", "number"
+	};
+	map <string, int> symbolTable;
 	/* end of your code */
 }
 
@@ -153,6 +151,7 @@ program:	{$$ = "";}
 function:	FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LOCALS declarations END_LOCALS BEGIN_BODY statements END_BODY
 		{
 			$$ = "func " + $2 + "\n";
+			symbolTable.insert(pair<string, int>($2, 0));
 			$$ += $5.code;
 			int i = 0;
 			for(list<string>::iterator it = $5.ids.begin(); it != $5.ids.end(); it++){
@@ -180,14 +179,32 @@ declarations: 	{$$.code=""; $$.ids=list<string>();}
 declaration:	identifiers COLON INTEGER
 		{
 			for(list<string>::iterator it = $1.begin(); it != $1.end(); it++){
+				if(find(tokenName.begin(), tokenName.end(), *it) != tokenName.end()) {
+					no_error = false;
+					yy::parser::error(@1, "Identifier " + *it + " is a reserved keyword");
+				}
+				if(symbolTable.find(*it) != symbolTable.end()) {
+					no_error = false;
+					yy::parser::error(@1, "Identifier " + *it + " is multiply-defined");
+				}
 			    $$.code += ". " + *it + "\n";
+			    symbolTable.insert(pair<string, int>(*it, 1));
 			}
 			$$.ids = $1;
 		}
 		| identifiers COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
 		{ 
 			for(list<string>::iterator it = $1.begin(); it != $1.end(); it++){
+				if(find(tokenName.begin(), tokenName.end(), *it) != tokenName.end()) {
+					no_error = false;
+					yy::parser::error(@1, "Identifier " + *it + " is a reserved keyword");
+				}
+				if(symbolTable.find(*it) != symbolTable.end()) {
+					no_error = false;
+					yy::parser::error(@1, "Identifier " + *it + " is multiply-defined");
+				}
 			    $$.code += ".[] " + *it + ", " + to_string($5) + "\n";
+			    symbolTable.insert(pair<string, int>(*it, 2));
 			}
 			$$.ids = $1;
 		}
@@ -232,8 +249,8 @@ statement:	var ASSIGN expression
 			$$.code += ": " + $$.first + "\n";
 			loop_flag++;
 			$$.code += $4.code;
-			$$.code += ": " + $$.second + "\n";
 			loop_flag--;
+			$$.code += ": " + $$.second + "\n";			
 		}
 		| IF bool_exp THEN statements ELSE statements ENDIF{
 			$$.first = newLabel();
@@ -246,8 +263,8 @@ statement:	var ASSIGN expression
 			$$.code += ": " + $$.first + "\n";
 			loop_flag++;
 			$$.code += $4.code;
-			$$.code += ": " + $$.second + "\n";
 			loop_flag--;
+			$$.code += ": " + $$.second + "\n";
 		}
 		| WHILE bool_exp BEGINLOOP statements ENDLOOP{
 			$$.first = newLabel();
@@ -296,11 +313,13 @@ statement:	var ASSIGN expression
 			}
 		}
 		| CONTINUE{
-			if(loop_flag >= 1 || whileloop_flag || doloop_flag){
+			/*if(loop_flag > 0 || whileloop_flag || doloop_flag){*/
 				$$.code = "continue\n";	
-			}else{
-			/*error9*/
-			}
+			/*}
+			else {
+				no_error = false;
+				yy::parser::error(@1, "CONTINUE must in a loop");
+			}*/
 		}
 		| RETURN expression{
 			$$.code = $2.code;
@@ -326,25 +345,33 @@ var:	IDENT
 			$$.array = false;
 			$$.code = "";
 			$$.position = $1;
+			if(symbolTable.find($1) == symbolTable.end()) {
+				no_error = false;
+				yy::parser::error(@1, "Identifier " + $1 + " is not defined");
+			}
 		}
 		| IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET
 		{
 			$$.array = true;
 			$$.code = $3.code;
 			$$.position = $1 + ", " + $3.position;
+			if(symbolTable.find($1) == symbolTable.end()) {
+				no_error = false;
+				yy::parser::error(@1, "Identifier " + $1 + " is not defined");
+			}
 		}
 		;
 
 bool_exp:	relation_and_exp
 		{
 			$$.position = $1.position;
-                        $$.code = $1.code;	
+            $$.code = $1.code;	
 		}
 		| relation_and_exp OR relation_and_exp{
 			$$.position = newPosition();
 			$$.code = ". " + $$.position + "\n";
-                        $$.code += $1.code + $3.code;
-                        $$.code += "|| " + $$.position + ", " + $1.position + ", " + $3.position + "\n";	
+            $$.code += $1.code + $3.code;
+            $$.code += "|| " + $$.position + ", " + $1.position + ", " + $3.position + "\n";	
 		}
 		;
 		
