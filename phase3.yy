@@ -42,6 +42,7 @@
 		string code;
 		string first;
 		string second;
+		string third;
 	};
 	
 	struct term_struct {
@@ -92,7 +93,9 @@ yy::parser::symbol_type yylex();
 		labelCount++;
 		return temp;
 	}
-	
+	vector <string>  tokenName {
+	}
+	map <string, int>
 	/* end of your code */
 }
 
@@ -106,6 +109,7 @@ yy::parser::symbol_type yylex();
 %token EQ NEQ LT GT LTE GTE
 %token SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN
 %token <int> NUMBER
+%token ERROR
 %type <string> IDENT program function comp
 %type <dec_struct> declarations declaration
 %type <var_struct> var
@@ -115,7 +119,6 @@ yy::parser::symbol_type yylex();
 %type <exp_struct> expression expressions multiplicative_expression 
 %type <exp_struct> relation_exp bool_exp relation_and_exp
 %type <term_struct> term
-%token ERROR
 %right UMINUS	
 
 
@@ -203,6 +206,7 @@ statement:	var ASSIGN expression
 		{
 			$$.code += $3.code;
 			if($1.array == true) {
+				$$.code += $1.code;
 				$$.code += "[]= " + $1.position + ", " + $3.position + "\n";
 			}
 			else {
@@ -238,22 +242,24 @@ statement:	var ASSIGN expression
 		| WHILE bool_exp BEGINLOOP statements ENDLOOP{
 			$$.first = newLabel();
             $$.second = newLabel();
-			$$.code = $2.code;
+            $$.third = newLabel();
+			$$.code = ": " + $$.third + "\n";
+			$$.code += $2.code;
 			$$.code += "?:= " + $$.first + ", " + $2.position + "\n";
+			whileloop_flag = false;
 			$$.code += ":= " + $$.second + "\n";
 			$$.code += ": " + $$.first + "\n";
 			whileloop_flag = true;
 			$$.code += $4.code;
-			$$.code += "?:= " + $$.first + ", " + $2.position + "\n";
-			whileloop_flag = false;
+			$$.code += ":= " + $$.third + "\n";
 			$$.code += ": " + $$.second + "\n";
 		}
 		| DO BEGINLOOP statements ENDLOOP WHILE bool_exp{
 			$$.first = newLabel();
-			$$.code = $6.code;
 			$$.code += ": " + $$.first + "\n";
 			doloop_flag = true;
 			$$.code += $3.code;
+			$$.code += $6.code;
 			$$.code += "?:= " + $$.first + ", " + $6.position + "\n";
 			doloop_flag = false;
 		}
@@ -308,11 +314,13 @@ vars:	var
 var:	IDENT
 		{ 
 			$$.array = false;
+			$$.code = "";
 			$$.position = $1;
 		}
 		| IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET
 		{
 			$$.array = true;
+			$$.code = $3.code;
 			$$.position = $1 + ", " + $3.position;
 		}
 		;
@@ -420,14 +428,14 @@ expression:	multiplicative_expression
 			$$.position = $1.position;
 			$$.code = $1.code;
 		}
-		| multiplicative_expression ADD multiplicative_expression
+		| expression ADD multiplicative_expression
 		{
 			$$.position = newPosition();
 			$$.code = ". " + $$.position + "\n";
 			$$.code += $1.code + $3.code;
 			$$.code += "+ " + $$.position + ", " + $1.position + ", " + $3.position + "\n";
 		}
-		| multiplicative_expression SUB multiplicative_expression
+		| expression SUB multiplicative_expression
 		{
 			$$.position = newPosition();
 			$$.code = ". " + $$.position + "\n";
@@ -472,6 +480,7 @@ term:	var
 				$$.code += "= " + $$.position + ", " + $1.position + "\n";
 			}
 			else {
+				$$.code += $1.code;
 				$$.code += "=[] " + $$.position + ", " + $1.position + "\n";
 			}
 			$$.id_list.push_back($1);

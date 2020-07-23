@@ -72,6 +72,7 @@
 		string code;
 		string first;
 		string second;
+		string third;
 	};
 	
 	struct term_struct {
@@ -83,7 +84,7 @@
 	
 	/* end the structures for non-terminal types */
 
-#line 87 "parser.tab.hh" // lalr1.cc:377
+#line 88 "parser.tab.hh" // lalr1.cc:377
 
 
 # include <cstdlib> // std::abort
@@ -160,7 +161,7 @@
 
 
 namespace yy {
-#line 164 "parser.tab.hh" // lalr1.cc:377
+#line 165 "parser.tab.hh" // lalr1.cc:377
 
 
 
@@ -817,7 +818,7 @@ namespace yy {
   static const unsigned char yydefact_[];
 
   // YYPGOTO[NTERM-NUM].
-  static const signed char yypgoto_[];
+  static const short int yypgoto_[];
 
   // YYDEFGOTO[NTERM-NUM].
   static const signed char yydefgoto_[];
@@ -947,7 +948,7 @@ namespace yy {
     enum
     {
       yyeof_ = 0,
-      yylast_ = 199,     ///< Last index in yytable_.
+      yylast_ = 196,     ///< Last index in yytable_.
       yynnts_ = 19,  ///< Number of nonterminal symbols.
       yyfinal_ = 6, ///< Termination state number.
       yyterror_ = 1,
@@ -1734,7 +1735,7 @@ namespace yy {
 
 
 } // yy
-#line 1738 "parser.tab.hh" // lalr1.cc:377
+#line 1739 "parser.tab.hh" // lalr1.cc:377
 
 
 
