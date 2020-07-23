@@ -94,6 +94,16 @@ yy::parser::symbol_type yylex();
 		return temp;
 	}
 	vector <string>  tokenName {
+	"FUNCTION" "IDENT" "BEGIN_PARAMS" "END_PARAMS" "BEGIN_LOCALS" "END_LOCALS" "BEGIN_BODY" "END_BODY" "INTEGER" "ARRAY"
+	"OF" "IF" "THEN" "ENDIF" "ELSE" "WHILE" "DO" "BEGINLOOP" "ENDLOOP" "CONTINUE" "READ" "WRITE" "AND" "OR" "NOT" "TRUE" "FALSE" "RETURN"
+	"SUB" "ADD" "MULT" "DIV" "MOD" "EQ" "NEQ" "LT" "GT" "LTE" "GTE"
+	"SEMICOLON" "COLON" "COMMA" "L_PAREN" "R_PAREN" "L_SQUARE_BRACKET" "R_SQUARE_BRACKET" "ASSIGN"
+	"NUMBER" "ERROR"
+	"function" "ident" "begin_params" "end_params" "begin_locals" "end_locals" "begin_body" "end_body" "integer" "array"
+	"of" "if" "then" "endif" "else" "while" "do" "beginloop" "endloop" "continue" "read" "write" "and" "or" "not" "true" "false" "return"
+	"sub" "add" "mult" "div" "mod" "eq" "neq" "lt" "gt" "lte" "gte"
+	"semicolon" "colon" "comma" "l_paren" "r_paren" "l_square_bracket" "r_square_bracket" "assign"
+	"number" "error"
 	}
 	map <string, int>
 	/* end of your code */
