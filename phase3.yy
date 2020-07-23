@@ -148,22 +148,19 @@ function:	FUNCTION IDENT SEMICOLON BEGIN_PARAMS declarations END_PARAMS BEGIN_LO
 			}
 			$$ += $8.code;
 			$$ += $11.code;
-			$$ += "endfunc";
+			$$ += "endfunc\n";
 		}
 		;
 
 declarations: 	{$$.code=""; $$.ids=list<string>();}
-		| declarations declaration SEMICOLON {
-			$$.code = $1.code + $2.code;
+		| declaration SEMICOLON declarations {
+			$$.code = $1.code + $3.code;
 			for(list<string>::iterator it = $1.ids.begin(); it != $1.ids.end(); it++){
 				$$.ids.push_back(*it);
 			}
-			for(list<string>::iterator it = $2.ids.begin(); it != $2.ids.end(); it++){
+			for(list<string>::iterator it = $3.ids.begin(); it != $3.ids.end(); it++){
 				$$.ids.push_back(*it);
 			}
-		}
-		| declarations declaration{
-			/*error*/
 		}
 		;
 
@@ -187,18 +184,18 @@ identifiers:	IDENT
 		{ 
 		  $$.push_back($1); 
 		}
-		| identifiers COMMA IDENT  
+		| IDENT COMMA identifiers
 		{ 
-		  for(list<string>::iterator it = $1.begin(); it != $1.end(); it++){
+		  $$.push_back($1);
+		  for(list<string>::iterator it = $3.begin(); it != $3.end(); it++){
 				$$.push_back(*it);
 		  }
-		  $$.push_back($3);
 		}
 		;
 
 statements: 	{$$.code = "";}
-		| statement SEMICOLON statements {
-			$$.code = $1.code + $3.code;
+		| statements statement SEMICOLON {
+			$$.code = $1.code + $2.code;
 		} 
 		;
 
@@ -214,16 +211,21 @@ statement:	var ASSIGN expression
 		}
 		| IF bool_exp THEN statements ENDIF{
 			$$.first = newLabel();
-			$$.code += "?:= " + $$.first + ", " + $2.code + "\n";
-			loop_flag++;
+			$$.second = newLabel();
+			$$.code = $2.code;
+			$$.code += "?:= " + $$.first + ", " + $2.position + "\n";
+			$$.code += ":= " + $$.second + "\n";
 			$$.code += ": " + $$.first + "\n";
+			loop_flag++;
 			$$.code += $4.code;
+			$$.code += ": " + $$.second + "\n";
 			loop_flag--;
 		}
 		| IF bool_exp THEN statements ELSE statements ENDIF{
 			$$.first = newLabel();
 			$$.second = newLabel();
-			$$.code += "?:= " + $$.first + ", " + $2.code + "\n";
+			$$.code = $2.code;
+			$$.code += "?:= " + $$.first + ", " + $2.position + "\n";
 			loop_flag++;
 			$$.code += $6.code;
 			$$.code += ":= " + $$.second + "\n";
@@ -235,22 +237,24 @@ statement:	var ASSIGN expression
 		}
 		| WHILE bool_exp BEGINLOOP statements ENDLOOP{
 			$$.first = newLabel();
-                        $$.second = newLabel();
-			$$.code += "?:= " + $$.first + ", " + $2.code + "\n";
+            $$.second = newLabel();
+			$$.code = $2.code;
+			$$.code += "?:= " + $$.first + ", " + $2.position + "\n";
 			$$.code += ":= " + $$.second + "\n";
 			$$.code += ": " + $$.first + "\n";
 			whileloop_flag = true;
 			$$.code += $4.code;
-			$$.code += "?:= " + $$.first + ", " + $2.code + "\n";
+			$$.code += "?:= " + $$.first + ", " + $2.position + "\n";
 			whileloop_flag = false;
 			$$.code += ": " + $$.second + "\n";
 		}
 		| DO BEGINLOOP statements ENDLOOP WHILE bool_exp{
 			$$.first = newLabel();
+			$$.code = $6.code;
 			$$.code += ": " + $$.first + "\n";
 			doloop_flag = true;
-			$$.code += $3.code + $6.code;
-			$$.code += "?:= " + $$.first + ", " + $6.code + "\n";
+			$$.code += $3.code;
+			$$.code += "?:= " + $$.first + ", " + $6.position + "\n";
 			doloop_flag = false;
 		}
 		| READ vars{
@@ -379,14 +383,12 @@ relation_exp:	expression comp expression
 		}
 		| L_PAREN bool_exp R_PAREN
 		{
-			$$.position = newPosition();
-			$$.code = ". " + $$.position + "\n";
+			$$.position = $2.position;
 			$$.code += $2.code;
 		}
 		| NOT L_PAREN bool_exp R_PAREN
 		{
-			$$.position = newPosition();
-			$$.code = ". " + $$.position + "\n";
+			$$.position = $3.position;
 			$$.code += $3.code;
 			$$.code += "! " + $$.position + ", " + $3.position + "\n";;
 		}
@@ -402,8 +404,7 @@ comp:		EQ		{$$ = "==";}
 
 expressions:	expression
 		{
-			$$.position = newPosition();
-			$$.code = ". " + $$.position + "\n";
+			$$.position = $1.position;
 			$$.code += $1.code;
 		}
 		| expressions COMMA expression
